@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demande de compte - CBSB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1A312C;
+    --forest-deep:#122420;
+    --teal:#428475;
+    --mint:#89D7B7;
+    --cream:#FFF4E1;
+    --cream-dim:#EFE3C9;
+    --ink-red:#A6432E;
+    --text-on-cream:#213A34;
+    --font-display:'Fraunces', serif;
+    --font-body:'Public Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{
+    font-family: var(--font-body);
+    color: var(--text-on-cream);
+    background: var(--cream);
+  }
+
+  .shell{
+    min-height:100vh;
+    display:grid;
+    grid-template-columns: 0.86fr 1fr;
+  }
+
+  /* ---------- Brand panel ---------- */
+  .brand-panel{
+    position:relative;
+    background:
+      radial-gradient(ellipse 60% 45% at 25% 12%, rgba(137,215,183,.16), transparent 60%),
+      repeating-linear-gradient(to bottom, transparent 0 39px, rgba(255,244,225,.05) 39px 40px),
+      linear-gradient(to right, transparent 0 78px, rgba(137,215,183,.14) 78px 79px, transparent 79px 100%),
+      linear-gradient(160deg, var(--forest) 0%, var(--forest-deep) 100%);
+    color: var(--cream);
+    padding: 56px 52px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+  }
+
+  .brand-mark{ display:flex; flex-direction:column; gap:18px; }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color: var(--mint);
+    opacity:.85;
+  }
+
+  .wordmark{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size: clamp(40px, 6vw, 58px);
+    letter-spacing:-.01em;
+    line-height:1;
+    margin:0;
+  }
+
+  .tagline{
+    font-family: var(--font-display);
+    font-style:italic;
+    font-weight:500;
+    font-size:17px;
+    color: var(--cream-dim);
+    max-width: 30ch;
+    line-height:1.5;
+    margin:0;
+  }
+
+  /* Status stepper - mirrors the real account lifecycle */
+  .stepper{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    margin-top:40px;
+  }
+  .step{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    position:relative;
+    padding-bottom:26px;
+  }
+  .step:last-child{ padding-bottom:0; }
+  .step::before{
+    content:"";
+    position:absolute;
+    left:11px; top:24px; bottom:0;
+    width:1px;
+    background: rgba(137,215,183,.3);
+  }
+  .step:last-child::before{ display:none; }
+  .step-num{
+    flex-shrink:0;
+    width:23px; height:23px;
+    border-radius:50%;
+    border:1.2px solid var(--mint);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    color: var(--mint);
+    background: rgba(137,215,183,.08);
+  }
+  .step.active .step-num{ background: var(--mint); color: var(--forest-deep); font-weight:600; }
+  .step-text b{
+    display:block;
+    font-size:13.5px;
+    font-weight:600;
+    color: var(--cream);
+  }
+  .step-text span{
+    font-size:12px;
+    color: var(--cream-dim);
+    opacity:.75;
+  }
+
+  .dossier{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    color: var(--cream-dim);
+    opacity:.55;
+  }
+
+  /* ---------- Form panel ---------- */
+  .form-panel{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 40px;
+  }
+
+  .box{
+    width:100%;
+    max-width:420px;
+  }
+
+  .box h2{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:30px;
+    margin:0 0 6px;
+    color: var(--forest);
+  }
+  .box .subhead{
+    font-size:14.5px;
+    color:#5A6E67;
+    margin:0 0 28px;
+  }
+
+  .grid-2{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+  }
+
+  .field{ margin-bottom: 18px; }
+
+  label.field-label{
+    display:block;
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color: var(--teal);
+    margin-bottom:8px;
+  }
+
+  input{
+    width:100%;
+    padding: 10px 2px;
+    font-family: var(--font-body);
+    font-size:15px;
+    color: var(--text-on-cream);
+    background: transparent;
+    border:none;
+    border-bottom: 1.5px solid rgba(26,49,44,.22);
+    border-radius:0;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  input::placeholder{ color:#9BA9A3; }
+  input:focus{
+    outline:none;
+    border-bottom-color: var(--teal);
+    box-shadow: 0 1px 0 0 var(--mint);
+  }
+  input.invalid{ border-bottom-color: var(--ink-red); }
+  input.invalid:focus{ box-shadow: 0 1px 0 0 var(--ink-red); }
+
+  .field-error{
+    font-family: var(--font-mono);
+    color: var(--ink-red);
+    font-size:11px;
+    min-height:15px;
+    margin-top:6px;
+  }
+
+  .msg{
+    font-family: var(--font-mono);
+    font-size:12.5px;
+    min-height:16px;
+    margin-bottom:14px;
+    padding: 0;
+  }
+  .msg.error{ color: var(--ink-red); }
+  .msg.success{
+    color: var(--forest);
+    background: rgba(137,215,183,.28);
+    border-left: 3px solid var(--teal);
+    padding: 10px 12px;
+    border-radius: 2px;
+    line-height:1.5;
+  }
+
+  button{
+    width:100%;
+    padding:13px;
+    margin-top:6px;
+    background: var(--forest);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:14.5px;
+    letter-spacing:.02em;
+    border:none;
+    border-radius:3px;
+    cursor:pointer;
+    transition: background .18s ease, transform .06s ease, box-shadow .18s ease;
+  }
+  button:hover{ background: var(--teal); box-shadow: 0 4px 14px rgba(66,132,117,.35); }
+  button:active{ transform: scale(.98); }
+  button:disabled{ background:#9BAFA9; cursor:not-allowed; box-shadow:none; }
+
+  a.switch-link{
+    display:block;
+    text-align:center;
+    margin-top:20px;
+    font-size:13.5px;
+    color: var(--teal);
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+  }
+  a.switch-link:hover{ border-bottom-color: var(--teal); }
+
+  :focus-visible{
+    outline: 2px solid var(--mint);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 860px){
+    .shell{ grid-template-columns: 1fr; }
+    .brand-panel{ padding:36px 28px; }
+    .stepper{ margin-top:26px; }
+    .form-panel{ padding: 36px 24px 56px; }
+    .grid-2{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="brand-panel">
+    <div class="brand-mark">
+      <span class="eyebrow">Cabinet d'expertise comptable</span>
+      <h1 class="wordmark">CBSB</h1>
+      <p class="tagline">Cabinet Ben Said Belgacem - la rigueur des chiffres, la clarté du conseil.</p>
+    </div>
+
+    <div class="stepper">
+      <div class="step active">
+        <span class="step-num">01</span>
+        <span class="step-text"><b>Demande</b><span>Vous renseignez vos informations</span></span>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <span class="step-text"><b>Vérification</b><span>Notre équipe examine votre dossier</span></span>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <span class="step-text"><b>Accès validé</b><span>Vous recevez un email et pouvez vous connecter</span></span>
+      </div>
+    </div>
+
+    <span class="dossier">Réf. plateforme - Kébili, Tunisie</span>
+  </aside>
+
+  <main class="form-panel">
+    <div class="box">
+      <h2>Demande de compte</h2>
+      <p class="subhead">Votre compte sera activé après validation par le cabinet.</p>
+      <div class="msg" id="msg"></div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label class="field-label" for="fullName">Nom complet</label>
+          <input type="text" id="fullName" placeholder="Prénom Nom" required />
+          <div class="field-error" id="fullName-error"></div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="companyName">Entreprise</label>
+          <input type="text" id="companyName" placeholder="Nom de l'entreprise" required />
+          <div class="field-error" id="companyName-error"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="email">Email</label>
+        <input type="email" id="email" placeholder="nom@exemple.com" required />
+        <div class="field-error" id="email-error"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label class="field-label" for="password">Mot de passe</label>
+          <input type="password" id="password" placeholder="••••••••" required />
+          <div class="field-error" id="password-error"></div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="confirmPassword">Confirmer</label>
+          <input type="password" id="confirmPassword" placeholder="••••••••" required />
+          <div class="field-error" id="confirmPassword-error"></div>
+        </div>
+      </div>
+
+      <button id="submitBtn" onclick="signup()">Envoyer la demande</button>
+      <a class="switch-link" href="/login">Déjà un compte ? Se connecter</a>
+    </div>
+  </main>
+
+</div>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+
+function setFieldError(id, message) {
+  const input = document.getElementById(id);
+  const errBox = document.getElementById(id + "-error");
+  input.classList.toggle("invalid", !!message);
+  errBox.textContent = message || "";
+}
+
+function validateSignupForm() {
+  let valid = true;
+
+  const fullName = document.getElementById("fullName").value.trim();
+  const companyName = document.getElementById("companyName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+
+  if (!fullName) {
+    setFieldError("fullName", "Requis.");
+    valid = false;
+  } else if (fullName.length < 3) {
+    setFieldError("fullName", "3 caractères min.");
+    valid = false;
+  } else {
+    setFieldError("fullName", "");
+  }
+
+  if (!companyName) {
+    setFieldError("companyName", "Requis.");
+    valid = false;
+  } else {
+    setFieldError("companyName", "");
+  }
+
+  if (!email) {
+    setFieldError("email", "L'email est requis.");
+    valid = false;
+  } else if (!EMAIL_REGEX.test(email)) {
+    setFieldError("email", "Format d'email invalide.");
+    valid = false;
+  } else {
+    setFieldError("email", "");
+  }
+
+  if (!password) {
+    setFieldError("password", "Requis.");
+    valid = false;
+  } else if (!PASSWORD_REGEX.test(password)) {
+    setFieldError("password", "8 car. min., 1 lettre, 1 chiffre.");
+    valid = false;
+  } else {
+    setFieldError("password", "");
+  }
+
+  if (!confirmPassword) {
+    setFieldError("confirmPassword", "Requis.");
+    valid = false;
+  } else if (confirmPassword !== password) {
+    setFieldError("confirmPassword", "Ne correspond pas.");
+    valid = false;
+  } else {
+    setFieldError("confirmPassword", "");
+  }
+
+  return valid;
+}
+
+["fullName", "companyName", "email", "password", "confirmPassword"].forEach(id => {
+  document.getElementById(id).addEventListener("blur", validateSignupForm);
+});
+
+async function signup() {
+  const msgBox = document.getElementById("msg");
+  msgBox.className = "msg";
+  msgBox.textContent = "";
+
+  if (!validateSignupForm()) return;
+
+  const full_name = document.getElementById("fullName").value.trim();
+  const company_name = document.getElementById("companyName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const btn = document.getElementById("submitBtn");
+
+  btn.disabled = true;
+  btn.textContent = "Envoi en cours...";
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, full_name, company_name, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Échec de l'inscription.");
+
+    msgBox.className = "msg success";
+    msgBox.textContent = "Demande envoyée. Vous recevrez un email une fois votre compte validé.";
+  } catch (err) {
+    msgBox.className = "msg error";
+    msgBox.textContent = err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Envoyer la demande";
+  }
+}
+</script>
+</body>
+</html>

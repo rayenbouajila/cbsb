@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBSB - Cabinet d'expertise comptable Ben Said Belgacem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1A312C;
+    --forest-deep:#122420;
+    --teal:#428475;
+    --mint:#89D7B7;
+    --cream:#FFF4E1;
+    --cream-dim:#EFE3C9;
+    --ink-red:#A6432E;
+    --text-on-cream:#213A34;
+    --font-display:'Fraunces', serif;
+    --font-body:'Public Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  html,body{ margin:0; }
+  body{
+    font-family: var(--font-body);
+    color: var(--text-on-cream);
+    background: var(--cream);
+  }
+  section{ scroll-margin-top: 78px; }
+  img,svg{ max-width:100%; }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--teal);
+    display:block;
+    margin-bottom:10px;
+  }
+  h1,h2,h3{ font-family: var(--font-display); color: var(--forest); margin:0; }
+  .wrap{ max-width:1140px; margin:0 auto; padding:0 32px; }
+
+  /* ---------- Navbar ---------- */
+  .navbar{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    height:70px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 32px;
+    background:
+      radial-gradient(ellipse 60% 200% at 8% 50%, rgba(137,215,183,.12), transparent 60%),
+      linear-gradient(120deg, var(--forest) 0%, var(--forest-deep) 100%);
+    box-shadow: 0 2px 14px rgba(18,36,32,.18);
+  }
+  .brand-lockup{ display:flex; align-items:center; gap:12px; text-decoration:none; cursor:pointer; }
+  .mini-seal{ width:32px; height:32px; flex-shrink:0; }
+  .brand-lockup .name{
+    font-family: var(--font-display);
+    font-weight:600; font-size:19px; color:var(--cream); letter-spacing:-.01em;
+  }
+
+  nav.links{ display:flex; align-items:center; gap:6px; }
+  nav.links a{
+    color: var(--cream-dim);
+    text-decoration:none;
+    font-size:14px; font-weight:500;
+    padding:9px 14px; border-radius:3px;
+    transition: color .15s ease, background .15s ease;
+  }
+  nav.links a:hover, nav.links a.active{ color: var(--cream); background: rgba(137,215,183,.12); }
+
+  .nav-actions{ display:flex; align-items:center; gap:10px; }
+  .btn-ghost-nav{
+    color: var(--cream); text-decoration:none; font-size:13.5px; font-weight:600;
+    padding:9px 16px; border:1px solid rgba(255,244,225,.32); border-radius:3px;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  .btn-ghost-nav:hover{ border-color: var(--mint); background: rgba(137,215,183,.1); }
+
+  .burger{ display:none; background:none; border:none; cursor:pointer; padding:8px; }
+  .burger span{ display:block; width:22px; height:2px; background:var(--cream); margin:5px 0; }
+
+  /* ---------- Buttons (shared) ---------- */
+  .btn-primary{
+    display:inline-block;
+    background: var(--forest); color: var(--cream);
+    font-weight:600; font-size:14.5px; text-decoration:none;
+    padding:13px 24px; border-radius:3px; border:1px solid var(--forest);
+    transition: background .18s ease, box-shadow .18s ease, transform .06s ease;
+  }
+  .btn-primary:hover{ background: var(--teal); border-color:var(--teal); box-shadow:0 4px 14px rgba(66,132,117,.35); }
+  .btn-primary:active{ transform:scale(.98); }
+
+  .btn-outline{
+    display:inline-block;
+    background: transparent; color: var(--forest);
+    font-weight:600; font-size:14.5px; text-decoration:none;
+    padding:12px 23px; border-radius:3px; border:1.5px solid rgba(26,49,44,.25);
+    transition: border-color .18s ease, background .18s ease;
+  }
+  .btn-outline:hover{ border-color: var(--teal); background: rgba(66,132,117,.06); }
+
+  /* ---------- Hero ---------- */
+  #accueil{
+    position:relative;
+    padding: 168px 0 100px;
+    background:
+      radial-gradient(ellipse 55% 50% at 20% 10%, rgba(137,215,183,.16), transparent 60%),
+      repeating-linear-gradient(to bottom, transparent 0 39px, rgba(255,244,225,.05) 39px 40px),
+      linear-gradient(to right, transparent 0 78px, rgba(137,215,183,.14) 78px 79px, transparent 79px 100%),
+      linear-gradient(160deg, var(--forest) 0%, var(--forest-deep) 100%);
+    color: var(--cream);
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid; grid-template-columns: 1.15fr .85fr; gap:40px; align-items:center;
+  }
+  #accueil h1{
+    color: var(--cream);
+    font-weight:600; font-size: clamp(34px, 4.6vw, 54px);
+    line-height:1.1; letter-spacing:-.01em; margin: 0 0 20px;
+    max-width: 16ch;
+  }
+  #accueil p.lead{
+    font-size:16.5px; line-height:1.7; color: var(--cream-dim);
+    max-width: 46ch; margin: 0 0 34px;
+  }
+  .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; }
+  .hero-ctas .btn-outline{ color:var(--cream); border-color: rgba(255,244,225,.35); }
+  .hero-ctas .btn-outline:hover{ border-color:var(--mint); background: rgba(137,215,183,.1); }
+
+  .hero-seal{ display:flex; justify-content:center; }
+  .hero-seal svg{ width:min(280px, 80%); animation: seal-in .7s cubic-bezier(.2,.9,.25,1) both; animation-delay:.1s; }
+  @media (prefers-reduced-motion: no-preference){
+    @keyframes seal-in{ 0%{opacity:0; transform:scale(1.25) rotate(-6deg);} 100%{opacity:1; transform:scale(1) rotate(0);} }
+  }
+  @media (prefers-reduced-motion: reduce){ .hero-seal svg{ animation:none; } }
+
+  /* ---------- Section shell ---------- */
+  .section{ padding: 88px 0; }
+  .section-head{ max-width: 640px; margin-bottom: 44px; }
+  .section-head h2{ font-weight:600; font-size: clamp(26px,3vw,34px); }
+  .section-head p{ font-size:15px; color:#5A6E67; margin-top:12px; line-height:1.7; }
+
+  /* ---------- About ---------- */
+  #apropos{ background: var(--cream); }
+  .about-grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap:56px; align-items:start; }
+  .about-grid p{ font-size:15.5px; line-height:1.8; color: var(--text-on-cream); margin: 0 0 16px; }
+
+  .values{ display:flex; flex-direction:column; gap:0; }
+  .value{ display:flex; gap:16px; padding: 20px 0; border-bottom:1px solid rgba(26,49,44,.09); }
+  .value:first-child{ padding-top:0; }
+  .value:last-child{ border-bottom:none; }
+  .value-marker{ width:9px; height:9px; background: var(--mint); margin-top:7px; flex-shrink:0; }
+  .value b{ display:block; font-size:15.5px; color: var(--forest); margin-bottom:4px; }
+  .value span{ font-size:14px; color:#5A6E67; line-height:1.6; }
+
+  /* ---------- Services ---------- */
+  #services{
+    background: var(--forest-deep);
+    color: var(--cream);
+  }
+  #services .section-head h2{ color: var(--cream); }
+  #services .section-head p{ color: var(--cream-dim); }
+  .services-grid{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:20px;
+  }
+  .service-card{
+    background: rgba(255,244,225,.04);
+    border: 1px solid rgba(137,215,183,.18);
+    border-radius:6px;
+    padding: 28px 24px;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease;
+  }
+  .service-card:hover{ transform: translateY(-3px); border-color: var(--mint); background: rgba(255,244,225,.07); }
+  .service-icon{
+    width:44px; height:44px; border-radius:50%;
+    background: rgba(137,215,183,.14);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:16px;
+  }
+  .service-icon svg{ width:22px; height:22px; stroke:var(--mint); fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  .service-card h3{ color:var(--cream); font-size:17px; font-weight:600; margin-bottom:8px; }
+  .service-card p{ font-size:13.8px; color: var(--cream-dim); line-height:1.65; margin:0; }
+
+  /* ---------- Contact ---------- */
+  #contact{ background: var(--cream); }
+  .contact-grid{ display:grid; grid-template-columns: .85fr 1.15fr; gap:44px; align-items:start; }
+
+  .info-card{
+    background:#fff; border:1px solid rgba(26,49,44,.08); border-radius:6px;
+    overflow:hidden; box-shadow: 0 1px 3px rgba(26,49,44,.05);
+  }
+  .info-row{ display:flex; gap:14px; padding:20px 24px; border-bottom:1px solid rgba(26,49,44,.07); }
+  .info-row:last-of-type{ border-bottom:none; }
+  .info-icon{
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    background: rgba(66,132,117,.1);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .info-icon svg{ width:17px; height:17px; stroke: var(--teal); fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .info-row .label{ font-family: var(--font-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:#8A9A93; margin-bottom:4px; display:block; }
+  .info-row .value{ font-size:14.5px; color: var(--forest); font-weight:600; }
+  .info-row .value a{ color:inherit; text-decoration:none; }
+  .info-row .value a:hover{ color: var(--teal); }
+
+  .map-frame{ border:none; width:100%; height:220px; display:block; filter: grayscale(.15); }
+
+  .form-card{
+    background:#fff; border:1px solid rgba(26,49,44,.08); border-radius:6px;
+    padding: 32px; box-shadow: 0 1px 3px rgba(26,49,44,.05);
+  }
+  .form-row-2{ display:grid; grid-template-columns:1fr 1fr; gap:0 16px; }
+  .field{ margin-bottom:20px; }
+  label.field-label{
+    display:block; font-family: var(--font-mono); font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color: var(--teal); margin-bottom:8px;
+  }
+  input, textarea{
+    width:100%; padding:10px 2px; font-family: var(--font-body); font-size:15px;
+    color: var(--text-on-cream); background:transparent; border:none;
+    border-bottom:1.5px solid rgba(26,49,44,.22); border-radius:0; resize:vertical;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  textarea{ min-height:96px; font-family: var(--font-body); }
+  input::placeholder, textarea::placeholder{ color:#9BA9A3; }
+  input:focus, textarea:focus{ outline:none; border-bottom-color: var(--teal); box-shadow: 0 1px 0 0 var(--mint); }
+  input.invalid, textarea.invalid{ border-bottom-color: var(--ink-red); }
+  .field-error{ font-family: var(--font-mono); color: var(--ink-red); font-size:11px; min-height:15px; margin-top:6px; }
+
+  .form-msg{ font-family: var(--font-mono); font-size:12.5px; min-height:16px; margin-bottom:14px; }
+  .form-msg.error{ color: var(--ink-red); }
+  .form-msg.success{
+    color: var(--forest); background: rgba(137,215,183,.28); border-left:3px solid var(--teal);
+    padding:10px 12px; border-radius:2px; line-height:1.5;
+  }
+
+  .form-card button{
+    width:100%; padding:13px; margin-top:4px; background: var(--forest); color: var(--cream);
+    font-family: var(--font-body); font-weight:600; font-size:14.5px; letter-spacing:.02em;
+    border:none; border-radius:3px; cursor:pointer;
+    transition: background .18s ease, transform .06s ease, box-shadow .18s ease;
+  }
+  .form-card button:hover{ background: var(--teal); box-shadow: 0 4px 14px rgba(66,132,117,.35); }
+  .form-card button:active{ transform:scale(.98); }
+  .form-card button:disabled{ background:#9BAFA9; cursor:not-allowed; box-shadow:none; }
+
+  /* ---------- Footer ---------- */
+  footer{ background: var(--forest-deep); color: var(--cream-dim); padding: 40px 0; }
+  .footer-grid{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  .footer-brand{ display:flex; align-items:center; gap:10px; }
+  .footer-brand .name{ font-family: var(--font-display); font-weight:600; color:var(--cream); font-size:16px; }
+  footer .addr{ font-family: var(--font-mono); font-size:12px; opacity:.7; }
+  footer nav{ display:flex; gap:20px; }
+  footer nav a{ color: var(--cream-dim); font-size:13px; text-decoration:none; }
+  footer nav a:hover{ color: var(--mint); }
+  .copyline{ text-align:center; font-family:var(--font-mono); font-size:11px; opacity:.5; margin-top:24px; }
+
+  :focus-visible{ outline: 2px solid var(--mint); outline-offset: 2px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 980px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .hero-seal{ display:none; }
+    .about-grid{ grid-template-columns:1fr; }
+    .services-grid{ grid-template-columns: repeat(2, 1fr); }
+    .contact-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 760px){
+    nav.links, .nav-actions .btn-ghost-nav{ display:none; }
+    .burger{ display:block; }
+    .navbar.open nav.links{
+      display:flex; flex-direction:column; position:absolute; top:70px; left:0; right:0;
+      background: var(--forest-deep); padding:12px 24px 20px; gap:2px;
+    }
+    .navbar.open .nav-actions .btn-ghost-nav{ display:inline-block; }
+    .wrap{ padding: 0 20px; }
+    .services-grid{ grid-template-columns:1fr; }
+    .form-row-2{ grid-template-columns:1fr; }
+    #accueil{ padding:140px 0 72px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="navbar" id="navbar">
+  <a href="#accueil" class="brand-lockup">
+    <svg class="mini-seal" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="18.5" fill="none" stroke="#89D7B7" stroke-opacity=".55" stroke-width="1"/>
+      <circle cx="20" cy="20" r="12.5" fill="none" stroke="#FFF4E1" stroke-opacity=".85" stroke-width="1"/>
+      <text x="20" y="24" text-anchor="middle" font-family="Fraunces, serif" font-weight="600" font-size="9" fill="#FFF4E1">CB</text>
+    </svg>
+    <span class="name">CBSB</span>
+  </a>
+
+  <nav class="links" id="navLinks">
+    <a href="#accueil" data-section="accueil">Accueil</a>
+    <a href="#apropos" data-section="apropos">Qui sommes-nous</a>
+    <a href="#services" data-section="services">Nos services</a>
+    <a href="#contact" data-section="contact">Contactez-nous</a>
+  </nav>
+
+  <div class="nav-actions">
+    <a href="signup" class="btn-ghost-nav">Espace client</a>
+    <button class="burger" id="burgerBtn" aria-label="Ouvrir le menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ===================== ACCUEIL ===================== -->
+<section id="accueil">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow" style="color:var(--mint)">Cabinet d'expertise comptable - Kébili, Tunisie</span>
+      <h1>Vos comptes, entre des mains rigoureuses.</h1>
+      <p class="lead">
+        Le Cabinet Ben Said Belgacem accompagne entrepreneurs, commerçants et sociétés de la région
+        de Kébili dans leur comptabilité, leur fiscalité et leurs décisions de gestion - avec la
+        précision d'un registre bien tenu et la disponibilité d'un conseiller de proximité.
+      </p>
+      <div class="hero-ctas">
+        <a href="signup" class="btn-primary">Demander un accès client</a>
+        <a href="#services" class="btn-outline">Découvrir nos services</a>
+      </div>
+    </div>
+    <div class="hero-seal">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="heroCurve" d="M 100,100 m -78,0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0" />
+        </defs>
+        <circle cx="100" cy="100" r="94" fill="none" stroke="#89D7B7" stroke-opacity=".3" stroke-width="1" stroke-dasharray="1.5 6" />
+        <circle cx="100" cy="100" r="78" fill="none" stroke="#89D7B7" stroke-opacity=".6" stroke-width="1.3" />
+        <circle cx="100" cy="100" r="56" fill="none" stroke="#FFF4E1" stroke-opacity=".9" stroke-width="1.3" />
+        <text font-family="IBM Plex Mono, monospace" font-size="9.5" letter-spacing="3.4" fill="#89D7B7">
+          <textPath href="#heroCurve" startOffset="2%">CABINET BEN SAID BELGACEM • KÉBILI •</textPath>
+        </text>
+        <text x="100" y="110" text-anchor="middle" font-family="Fraunces, serif" font-weight="600" font-size="32" fill="#FFF4E1">CBSB</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== QUI SOMMES-NOUS ===================== -->
+<section id="apropos" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Le cabinet</span>
+      <h2>Qui sommes-nous</h2>
+    </div>
+
+    <div class="about-grid">
+      <div>
+        <p>
+          Basé Avenue Habib Bourguiba à Kébili, le Cabinet Ben Said Belgacem est une structure
+          d'expertise comptable au service des professionnels et des entreprises de la région.
+          Nous tenons vos comptes, préparons vos déclarations et vous conseillons sur vos choix
+          de gestion, avec la même exigence que celle appliquée à chaque écriture d'un registre.
+        </p>
+        <p>
+          Notre approche reste volontairement humaine : chaque dossier est suivi par un
+          interlocuteur identifié, qui connaît votre activité et reste joignable en dehors des
+          seules périodes de clôture ou de déclaration fiscale.
+        </p>
+      </div>
+
+      <div class="values">
+        <div class="value">
+          <span class="value-marker"></span>
+          <div><b>Rigueur</b><span>Chaque chiffre est vérifié, chaque échéance anticipée. Rien n'est laissé au hasard dans la tenue de vos comptes.</span></div>
+        </div>
+        <div class="value">
+          <span class="value-marker"></span>
+          <div><b>Confidentialité</b><span>Vos données financières sont traitées avec la discrétion que mérite tout dossier comptable.</span></div>
+        </div>
+        <div class="value">
+          <span class="value-marker"></span>
+          <div><b>Proximité</b><span>Un cabinet ancré à Kébili, à l'écoute des réalités locales des entrepreneurs de la région.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SERVICES ===================== -->
+<section id="services" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Ce que nous faisons</span>
+      <h2>Nos services</h2>
+      <p>Un accompagnement complet, de la tenue quotidienne de vos comptes aux décisions stratégiques.</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h13a2 2 0 0 1 2 2v13a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V4z"/><path d="M4 4v14a2 2 0 0 0 2 2"/><path d="M8 9h8M8 13h6"/></svg>
+        </div>
+        <h3>Comptabilité générale</h3>
+        <p>Tenue et supervision de votre comptabilité, saisie des pièces, rapprochements bancaires et établissement des états financiers.</p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+        </div>
+        <h3>Fiscalité &amp; déclarations</h3>
+        <p>Préparation et dépôt de vos déclarations fiscales, TVA et impôts, avec veille sur les échéances et la réglementation en vigueur.</p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 21v-1a6 6 0 0 1 12 0v1"/><circle cx="18" cy="9" r="2.5"/><path d="M15.5 21v-1a4.5 4.5 0 0 1 7-3.75"/></svg>
+        </div>
+        <h3>Paie &amp; gestion sociale</h3>
+        <p>Établissement des bulletins de paie, déclarations sociales et suivi des obligations liées à vos employés.</p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 17l5-5 4 4 8-8"/><path d="M14 8h6v6"/></svg>
+        </div>
+        <h3>Conseil &amp; gestion</h3>
+        <p>Analyse de vos résultats, aide au pilotage budgétaire et accompagnement dans vos décisions de développement.</p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 21V10l9-6 9 6v11"/><path d="M9 21v-6h6v6"/><path d="M12 4v3"/></svg>
+        </div>
+        <h3>Création d'entreprise</h3>
+        <p>Accompagnement dans vos démarches de constitution, choix du statut juridique et formalités administratives.</p>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/><path d="M8 10h4"/></svg>
+        </div>
+        <h3>Audit &amp; expertise</h3>
+        <p>Revue de vos comptes et procédures internes, pour fiabiliser vos données et sécuriser vos décisions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONTACT ===================== -->
+<section id="contact" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Parlons de votre dossier</span>
+      <h2>Contactez-nous</h2>
+      <p>Une question, un dossier à ouvrir ? Écrivez-nous ou passez au cabinet, Avenue Habib Bourguiba à Kébili.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div>
+        <div class="info-card">
+          <div class="info-row">
+            <span class="info-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+            <div><span class="label">Email</span><span class="value"><a href="mailto:contact@cbsb-kebili.tn">contact@cbsb-kebili.tn</a></span></div>
+          </div>
+          <div class="info-row">
+            <span class="info-icon"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.45 2.1L8.1 9.6a16 16 0 0 0 6 6l1.1-1.15a2 2 0 0 1 2.1-.45c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.05z"/></svg></span>
+            <div><span class="label">Téléphone</span><span class="value"><a href="tel:+21675XXXXXX">+216 75 XXX XXX</a></span></div>
+          </div>
+          <div class="info-row">
+            <span class="info-icon"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></span>
+            <div><span class="label">Adresse</span><span class="value">Av. Habib Bourguiba, Kébili, Tunisie</span></div>
+          </div>
+          <iframe
+            class="map-frame"
+            title="Localisation CBSB sur Google Maps"
+            src="https://www.google.com/maps?q=Av.+Habib+Bourguiba,+Kebili,+Tunisie&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-msg" id="formMsg"></div>
+
+        <div class="form-row-2">
+          <div class="field">
+            <label class="field-label" for="cName">Nom</label>
+            <input type="text" id="cName" placeholder="Votre nom" required />
+            <div class="field-error" id="cName-error"></div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="cEmail">Email</label>
+            <input type="email" id="cEmail" placeholder="nom@exemple.com" required />
+            <div class="field-error" id="cEmail-error"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="cSubject">Sujet</label>
+          <input type="text" id="cSubject" placeholder="Objet de votre message" required />
+          <div class="field-error" id="cSubject-error"></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="cMessage">Message</label>
+          <textarea id="cMessage" placeholder="Décrivez votre demande..." required></textarea>
+          <div class="field-error" id="cMessage-error"></div>
+        </div>
+
+        <button id="contactSubmitBtn" onclick="sendContactMessage()">Envoyer le message</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <svg class="mini-seal" width="30" height="30" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="18.5" fill="none" stroke="#89D7B7" stroke-opacity=".55" stroke-width="1"/>
+          <circle cx="20" cy="20" r="12.5" fill="none" stroke="#FFF4E1" stroke-opacity=".85" stroke-width="1"/>
+          <text x="20" y="24" text-anchor="middle" font-family="Fraunces, serif" font-weight="600" font-size="9" fill="#FFF4E1">CB</text>
+        </svg>
+        <div>
+          <div class="name">CBSB</div>
+          <div class="addr">Av. Habib Bourguiba, Kébili, Tunisie</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#accueil">Accueil</a>
+        <a href="#apropos">Qui sommes-nous</a>
+        <a href="#services">Nos services</a>
+        <a href="#contact">Contactez-nous</a>
+      </nav>
+    </div>
+    <p class="copyline" id="copyline">© Cabinet Ben Said Belgacem - Kébili, Tunisie</p>
+  </div>
+</footer>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+
+/* Year in footer */
+document.getElementById("copyline").textContent =
+  `© ${new Date().getFullYear()} Cabinet Ben Said Belgacem - Kébili, Tunisie`;
+
+/* Mobile menu toggle */
+const navbar = document.getElementById("navbar");
+const burgerBtn = document.getElementById("burgerBtn");
+burgerBtn.addEventListener("click", () => navbar.classList.toggle("open"));
+document.getElementById("navLinks").addEventListener("click", (e) => {
+  if (e.target.tagName === "A") navbar.classList.remove("open");
+});
+
+/* Scroll-spy: highlight active nav link */
+const sections = document.querySelectorAll("section[id]");
+const navLinkEls = document.querySelectorAll("nav.links a");
+const spyObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinkEls.forEach(link => {
+        link.classList.toggle("active", link.dataset.section === id);
+      });
+    }
+  });
+}, { rootMargin: "-40% 0px -55% 0px" });
+sections.forEach(sec => spyObserver.observe(sec));
+
+/* Contact form validation + submit */
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function setContactFieldError(id, message) {
+  const input = document.getElementById(id);
+  const errBox = document.getElementById(id + "-error");
+  input.classList.toggle("invalid", !!message);
+  errBox.textContent = message || "";
+}
+
+function validateContactForm() {
+  let valid = true;
+  const name = document.getElementById("cName").value.trim();
+  const email = document.getElementById("cEmail").value.trim();
+  const subject = document.getElementById("cSubject").value.trim();
+  const message = document.getElementById("cMessage").value.trim();
+
+  if (!name) { setContactFieldError("cName", "Le nom est requis."); valid = false; }
+  else { setContactFieldError("cName", ""); }
+
+  if (!email) { setContactFieldError("cEmail", "L'email est requis."); valid = false; }
+  else if (!EMAIL_REGEX.test(email)) { setContactFieldError("cEmail", "Format d'email invalide."); valid = false; }
+  else { setContactFieldError("cEmail", ""); }
+
+  if (!subject) { setContactFieldError("cSubject", "Le sujet est requis."); valid = false; }
+  else { setContactFieldError("cSubject", ""); }
+
+  if (!message) { setContactFieldError("cMessage", "Le message est requis."); valid = false; }
+  else if (message.length < 10) { setContactFieldError("cMessage", "10 caractères minimum."); valid = false; }
+  else { setContactFieldError("cMessage", ""); }
+
+  return valid;
+}
+
+["cName", "cEmail", "cSubject", "cMessage"].forEach(id => {
+  document.getElementById(id).addEventListener("blur", validateContactForm);
+});
+
+async function sendContactMessage() {
+  const msgBox = document.getElementById("formMsg");
+  msgBox.className = "form-msg";
+  msgBox.textContent = "";
+
+  if (!validateContactForm()) return;
+
+  const payload = {
+    name: document.getElementById("cName").value.trim(),
+    email: document.getElementById("cEmail").value.trim(),
+    subject: document.getElementById("cSubject").value.trim(),
+    message: document.getElementById("cMessage").value.trim()
+  };
+
+  const btn = document.getElementById("contactSubmitBtn");
+  btn.disabled = true;
+  btn.textContent = "Envoi en cours...";
+
+  try {
+    const res = await fetch(`${API_BASE}/contact/send`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Échec de l'envoi.");
+
+    msgBox.className = "form-msg success";
+    msgBox.textContent = "Message envoyé. Nous vous répondrons rapidement.";
+    ["cName", "cEmail", "cSubject", "cMessage"].forEach(id => document.getElementById(id).value = "");
+  } catch (err) {
+    msgBox.className = "form-msg error";
+    msgBox.textContent = err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Envoyer le message";
+  }
+}
+</script>
+</body>
+</html>

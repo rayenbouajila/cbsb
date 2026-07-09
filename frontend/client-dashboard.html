@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace Client - CBSB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1A312C;
+    --forest-deep:#122420;
+    --teal:#428475;
+    --mint:#89D7B7;
+    --cream:#FFF4E1;
+    --cream-dim:#EFE3C9;
+    --ink-red:#A6432E;
+    --text-on-cream:#213A34;
+    --font-display:'Fraunces', serif;
+    --font-body:'Public Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    font-family: var(--font-body);
+    color: var(--text-on-cream);
+    background: var(--cream);
+    min-height:100vh;
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 16px 40px;
+    background:
+      radial-gradient(ellipse 60% 140% at 10% 50%, rgba(137,215,183,.14), transparent 65%),
+      linear-gradient(120deg, var(--forest) 0%, var(--forest-deep) 100%);
+    color: var(--cream);
+  }
+  .brand-lockup{ display:flex; align-items:center; gap:14px; }
+  .mini-seal{ width:34px; height:34px; flex-shrink:0; }
+  .brand-text{ display:flex; align-items:baseline; gap:10px; }
+  .brand-text .name{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:19px;
+    letter-spacing:-.01em;
+  }
+  .brand-text .sep{ color: rgba(255,244,225,.35); font-size:14px; }
+  .brand-text .zone{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--mint);
+  }
+
+  a.logout{
+    color: var(--cream);
+    text-decoration:none;
+    font-size:13px;
+    font-family: var(--font-body);
+    font-weight:500;
+    padding:8px 16px;
+    border:1px solid rgba(255,244,225,.3);
+    border-radius:3px;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  a.logout:hover{ border-color: var(--mint); background: rgba(137,215,183,.1); }
+
+  /* ---------- Content ---------- */
+  .page{
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--teal);
+    display:block;
+    margin-bottom:8px;
+  }
+
+  h2{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size: 30px;
+    color: var(--forest);
+    margin:0 0 28px;
+  }
+
+  h3.section-title{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size: 20px;
+    color: var(--forest);
+    margin: 0 0 12px;
+  }
+
+  .section-gap{ height:40px; }
+
+  .dossier-card{
+    background:#fff;
+    border-radius:6px;
+    border: 1px solid rgba(26,49,44,.08);
+    border-left: 4px solid var(--teal);
+    box-shadow: 0 1px 3px rgba(26,49,44,.05);
+    padding: 8px 0;
+  }
+
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 18px 28px;
+    border-bottom: 1px solid rgba(26,49,44,.07);
+    gap: 16px;
+  }
+  .row:last-child{ border-bottom:none; }
+
+  .row-label{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color: #8A9A93;
+    flex-shrink:0;
+  }
+  .row-value{
+    font-size: 15.5px;
+    color: var(--forest);
+    font-weight:600;
+    text-align:right;
+  }
+
+  .pill{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight:600;
+  }
+  .pill.pending{ background: rgba(66,132,117,.12); color: var(--teal); border:1px solid rgba(66,132,117,.3); }
+  .pill.active{ background: rgba(137,215,183,.28); color:#1A312C; border:1px solid rgba(66,132,117,.35); }
+  .pill.rejected{ background: rgba(166,67,45,.1); color: var(--ink-red); border:1px solid rgba(166,67,45,.3); }
+
+  .loading, .error-state{
+    padding: 40px 20px;
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size:13px;
+    color:#8A9A93;
+  }
+  .error-state{ color: var(--ink-red); }
+
+  .footnote{
+    margin-top:20px;
+    font-family: var(--font-mono);
+    font-size:11.5px;
+    color:#8A9A93;
+    text-align:center;
+  }
+
+  /* ---------- Invoices card ---------- */
+  .invoices-card{
+    background:#fff;
+    border-radius:6px;
+    border: 1px solid rgba(26,49,44,.08);
+    border-left: 4px solid var(--teal);
+    box-shadow: 0 1px 3px rgba(26,49,44,.05);
+    overflow:hidden;
+  }
+
+  .upload-zone{
+    border: 1.5px dashed rgba(66,132,117,.4);
+    border-radius:6px;
+    padding: 24px 18px;
+    text-align:center;
+    cursor:pointer;
+    margin: 18px 20px 6px;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  .upload-zone:hover, .upload-zone.dragover{
+    border-color: var(--teal);
+    background: rgba(137,215,183,.08);
+  }
+  .upload-zone input[type="file"]{ display:none; }
+  .upload-icon{ color: var(--teal); margin: 0 auto 8px; display:block; }
+  .upload-text{ font-size:13.5px; font-weight:600; color: var(--text-on-cream); }
+  .upload-sub{
+    font-family: var(--font-mono);
+    font-size:11px;
+    color:#8A9A93;
+    margin-top:4px;
+    letter-spacing:.02em;
+  }
+
+  .upload-status{
+    font-family: var(--font-mono);
+    font-size:12px;
+    text-align:center;
+    margin: 0 20px 16px;
+    min-height:16px;
+  }
+  .upload-status.uploading{ color: var(--teal); }
+  .upload-status.success{ color: var(--teal); }
+  .upload-status.error{ color: var(--ink-red); }
+
+  .invoices-list{ padding: 4px 0 8px; }
+
+  .invoice-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 13px 20px;
+    border-top: 1px solid rgba(26,49,44,.07);
+    gap: 12px;
+  }
+
+  .invoice-info{ display:flex; align-items:center; gap:11px; min-width:0; }
+  .invoice-icon{
+    width:32px; height:32px; flex-shrink:0;
+    border-radius:6px;
+    background: rgba(66,132,117,.1);
+    color: var(--teal);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .invoice-name{
+    font-weight:600;
+    font-size:13.8px;
+    color: var(--forest);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width: 260px;
+  }
+  .invoice-date{
+    font-family: var(--font-mono);
+    font-size:11px;
+    color:#8A9A93;
+    margin-top:2px;
+  }
+
+  .invoice-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .invoice-actions button{
+    padding:6px 12px;
+    border-radius:3px;
+    cursor:pointer;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12px;
+    white-space:nowrap;
+    transition: background .18s ease, color .18s ease;
+  }
+  .btn-download{
+    background: transparent;
+    color: var(--teal);
+    border: 1px solid rgba(66,132,117,.35);
+  }
+  .btn-download:hover{ background: var(--teal); color:#fff; }
+  .btn-delete-inv{
+    background: transparent;
+    color: var(--ink-red);
+    border: 1px solid rgba(166,67,45,.35);
+  }
+  .btn-delete-inv:hover{ background: var(--ink-red); color:#fff; }
+  .invoice-actions button:disabled{ opacity:.5; cursor:not-allowed; }
+
+  .invoices-empty{
+    padding: 22px 20px 26px;
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size:12.5px;
+    color:#8A9A93;
+  }
+
+  /* ---------- Confirm modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background: rgba(18,36,32,.55);
+    backdrop-filter: blur(2px);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px; z-index:1000;
+    opacity:0; pointer-events:none;
+    transition: opacity .16s ease;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal-box{
+    background:#fff;
+    border-radius:8px;
+    max-width: 380px;
+    width:100%;
+    padding: 26px 26px 20px;
+    box-shadow: 0 12px 36px rgba(18,36,32,.28);
+    transform: translateY(6px) scale(.98);
+    transition: transform .16s ease;
+  }
+  .modal-overlay.open .modal-box{ transform: translateY(0) scale(1); }
+  .modal-eyebrow{
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--ink-red);
+    display:block;
+    margin-bottom:8px;
+  }
+  .modal-box h3{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:19px;
+    color: var(--forest);
+    margin:0 0 10px;
+  }
+  .modal-box p{
+    font-size:14px;
+    line-height:1.55;
+    color:#5A6E67;
+    margin:0 0 22px;
+  }
+  .modal-box p strong{ color: var(--text-on-cream); }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; }
+  .modal-cancel{
+    background: transparent;
+    color: var(--text-on-cream);
+    border: 1px solid rgba(26,49,44,.18);
+    padding:7px 14px;
+    border-radius:3px;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12.5px;
+    cursor:pointer;
+  }
+  .modal-cancel:hover{ background: rgba(26,49,44,.05); }
+  .modal-confirm{
+    background: var(--ink-red);
+    color:#fff;
+    border: 1px solid var(--ink-red);
+    padding:7px 14px;
+    border-radius:3px;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12.5px;
+    cursor:pointer;
+  }
+  .modal-confirm:hover{ background:#8a3626; }
+
+  :focus-visible{ outline: 2px solid var(--mint); outline-offset: 2px; }
+
+  @media (max-width: 480px){
+    .topbar{ padding:14px 20px; }
+    .page{ padding: 40px 16px; }
+    .row{ padding: 16px 18px; }
+    .invoice-row{ flex-wrap:wrap; }
+    .invoice-name{ max-width: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand-lockup">
+    <svg class="mini-seal" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="18.5" fill="none" stroke="#89D7B7" stroke-opacity=".55" stroke-width="1"/>
+      <circle cx="20" cy="20" r="12.5" fill="none" stroke="#FFF4E1" stroke-opacity=".85" stroke-width="1"/>
+      <text x="20" y="24" text-anchor="middle" font-family="Fraunces, serif" font-weight="600" font-size="9" fill="#FFF4E1">CB</text>
+    </svg>
+    <div class="brand-text">
+      <span class="name">CBSB</span>
+      <span class="sep">/</span>
+      <span class="zone">Espace client</span>
+    </div>
+  </div>
+  <a href="/login" class="logout" onclick="sessionStorage.clear()">Se déconnecter</a>
+</header>
+
+<main class="page">
+  <span class="eyebrow">Mon dossier</span>
+  <h2>Bienvenue</h2>
+
+  <div class="dossier-card" id="cardWrap">
+    <div id="info"><p class="loading">Chargement de votre profil...</p></div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <h3 class="section-title">Mes factures</h3>
+  <div class="invoices-card">
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" accept="application/pdf,.pdf">
+      <svg class="upload-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M6 10l6-6 6 6"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+      <div class="upload-text">Glissez un PDF ici ou cliquez pour parcourir</div>
+      <div class="upload-sub">Format PDF uniquement · 10 Mo max</div>
+    </div>
+    <p class="upload-status" id="uploadStatus"></p>
+    <div class="invoices-list" id="invoicesList"><p class="invoices-empty">Chargement de vos factures...</p></div>
+  </div>
+
+  <p class="footnote">Cabinet Ben Said Belgacem - Kébili, Tunisie</p>
+</main>
+
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-box">
+    <span class="modal-eyebrow">Action requise</span>
+    <h3 id="confirmTitle">Confirmer l'action</h3>
+    <p id="confirmText">Êtes-vous sûr ?</p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeConfirm()">Annuler</button>
+      <button class="modal-confirm" id="confirmBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+const token = sessionStorage.getItem("token");
+const MAX_SIZE = 10 * 1024 * 1024; // 10 Mo
+
+if (!token) {
+  window.location.href = "/login";
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML;
+}
+
+function formatDate(iso) {
+  try {
+    return new Date(iso).toLocaleString("fr-FR", {
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit"
+    });
+  } catch {
+    return iso;
+  }
+}
+
+/* ---------- Confirm modal ---------- */
+const confirmOverlay = document.getElementById("confirmOverlay");
+const confirmTitle = document.getElementById("confirmTitle");
+const confirmText = document.getElementById("confirmText");
+const confirmBtn = document.getElementById("confirmBtn");
+
+function openConfirm({ title, text, onConfirm }) {
+  confirmTitle.textContent = title;
+  confirmText.innerHTML = text;
+  confirmBtn.onclick = () => {
+    closeConfirm();
+    onConfirm();
+  };
+  confirmOverlay.classList.add("open");
+}
+function closeConfirm() {
+  confirmOverlay.classList.remove("open");
+  confirmBtn.onclick = null;
+}
+confirmOverlay.addEventListener("click", (e) => {
+  if (e.target === confirmOverlay) closeConfirm();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeConfirm();
+});
+
+/* ---------- Profile ---------- */
+function statusPill(status) {
+  const s = (status || "").toLowerCase();
+  if (s.includes("approuv") || s.includes("active") || s.includes("valid")) {
+    return { cls: "active", label: "Compte validé" };
+  }
+  if (s.includes("reject") || s.includes("refus")) {
+    return { cls: "rejected", label: "Demande rejetée" };
+  }
+  return { cls: "pending", label: status ? status : "En attente" };
+}
+
+async function loadProfile() {
+  const info = document.getElementById("info");
+  try {
+    const res = await fetch(`${API_BASE}/auth/me`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const user = await res.json();
+    if (!res.ok) throw new Error(user.detail);
+
+    const pill = statusPill(user.status);
+
+    info.innerHTML = `
+      <div class="row">
+        <span class="row-label">Nom</span>
+        <span class="row-value">${escapeHtml(user.full_name) || "-"}</span>
+      </div>
+      <div class="row">
+        <span class="row-label">Entreprise</span>
+        <span class="row-value">${escapeHtml(user.company_name) || "-"}</span>
+      </div>
+      <div class="row">
+        <span class="row-label">Email</span>
+        <span class="row-value">${escapeHtml(user.email)}</span>
+      </div>
+      <div class="row">
+        <span class="row-label">Statut</span>
+        <span class="pill ${pill.cls}">${escapeHtml(pill.label)}</span>
+      </div>
+    `;
+  } catch (err) {
+    info.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+/* ---------- Invoices ---------- */
+const pdfIconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M15 2v5h5"/></svg>`;
+
+async function loadInvoices() {
+  const wrap = document.getElementById("invoicesList");
+  try {
+    const res = await fetch(`${API_BASE}/client/invoices`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const invoices = await res.json();
+    if (!res.ok) throw new Error(invoices.detail);
+
+    if (invoices.length === 0) {
+      wrap.innerHTML = '<p class="invoices-empty">Aucune facture envoyée pour le moment.</p>';
+      return;
+    }
+
+    wrap.innerHTML = invoices.map(inv => `
+      <div class="invoice-row" data-id="${inv.id}">
+        <div class="invoice-info">
+          <span class="invoice-icon">${pdfIconSvg}</span>
+          <div>
+            <div class="invoice-name">${escapeHtml(inv.filename)}</div>
+            <div class="invoice-date">${formatDate(inv.uploaded_at)}</div>
+          </div>
+        </div>
+        <div class="invoice-actions">
+          <button class="btn-download" onclick="downloadInvoice(${inv.id}, this)">Télécharger</button>
+          <button class="btn-delete-inv" onclick="confirmDeleteInvoice(${inv.id}, this)">Supprimer</button>
+        </div>
+      </div>
+    `).join("");
+  } catch (err) {
+    wrap.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+function setUploadStatus(text, kind) {
+  const status = document.getElementById("uploadStatus");
+  status.textContent = text;
+  status.className = "upload-status" + (kind ? " " + kind : "");
+}
+
+async function uploadInvoice(file) {
+  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+    setUploadStatus("Seuls les fichiers PDF sont acceptés.", "error");
+    return;
+  }
+  if (file.size > MAX_SIZE) {
+    setUploadStatus("Le fichier dépasse la taille maximale (10 Mo).", "error");
+    return;
+  }
+
+  setUploadStatus(`Envoi de "${file.name}"...`, "uploading");
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const res = await fetch(`${API_BASE}/client/invoices`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` },
+      body: formData
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Échec de l'envoi de la facture.");
+
+    setUploadStatus("Facture envoyée avec succès.", "success");
+    loadInvoices();
+    setTimeout(() => setUploadStatus(""), 3000);
+  } catch (err) {
+    setUploadStatus(`Erreur : ${err.message}`, "error");
+  }
+}
+
+async function downloadInvoice(id, btn) {
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/client/invoices/${id}/download`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Téléchargement impossible.");
+    const blob = await res.blob();
+    const cd = res.headers.get("Content-Disposition") || "";
+    const match = cd.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : "facture.pdf";
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    setUploadStatus(`Erreur : ${err.message}`, "error");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function confirmDeleteInvoice(id, btn) {
+  const name = btn.closest(".invoice-row").querySelector(".invoice-name")?.textContent || "cette facture";
+  openConfirm({
+    title: "Supprimer la facture",
+    text: `Voulez-vous vraiment supprimer <strong>${escapeHtml(name)}</strong> ? Cette action est irréversible.`,
+    onConfirm: async () => {
+      btn.disabled = true;
+      try {
+        await fetch(`${API_BASE}/client/invoices/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } finally {
+        loadInvoices();
+      }
+    }
+  });
+}
+
+/* ---------- Upload zone interactions ---------- */
+const uploadZone = document.getElementById("uploadZone");
+const fileInput = document.getElementById("fileInput");
+
+uploadZone.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", () => {
+  if (fileInput.files[0]) uploadInvoice(fileInput.files[0]);
+  fileInput.value = "";
+});
+
+["dragenter", "dragover"].forEach(evt =>
+  uploadZone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    uploadZone.classList.add("dragover");
+  })
+);
+["dragleave", "drop"].forEach(evt =>
+  uploadZone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove("dragover");
+  })
+);
+uploadZone.addEventListener("drop", (e) => {
+  const file = e.dataTransfer.files[0];
+  if (file) uploadInvoice(file);
+});
+
+loadProfile();
+loadInvoices();
+</script>
+</body>
+</html>

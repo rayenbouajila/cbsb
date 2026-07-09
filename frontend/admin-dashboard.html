@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration - CBSB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1A312C;
+    --forest-deep:#122420;
+    --teal:#428475;
+    --mint:#89D7B7;
+    --cream:#FFF4E1;
+    --cream-dim:#EFE3C9;
+    --ink-red:#A6432E;
+    --text-on-cream:#213A34;
+    --font-display:'Fraunces', serif;
+    --font-body:'Public Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    font-family: var(--font-body);
+    color: var(--text-on-cream);
+    background: var(--cream);
+    min-height:100vh;
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 12px 28px;
+    background:
+      radial-gradient(ellipse 60% 140% at 10% 50%, rgba(137,215,183,.14), transparent 65%),
+      linear-gradient(120deg, var(--forest) 0%, var(--forest-deep) 100%);
+    color: var(--cream);
+  }
+  .brand-lockup{ display:flex; align-items:center; gap:14px; }
+  .mini-seal{ width:34px; height:34px; flex-shrink:0; }
+  .brand-text{ display:flex; align-items:baseline; gap:10px; }
+  .brand-text .name{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:19px;
+    letter-spacing:-.01em;
+  }
+  .brand-text .sep{ color: rgba(255,244,225,.35); font-size:14px; }
+  .brand-text .zone{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--mint);
+  }
+
+  a.logout{
+    color: var(--cream);
+    text-decoration:none;
+    font-size:13px;
+    font-family: var(--font-body);
+    font-weight:500;
+    padding:8px 16px;
+    border:1px solid rgba(255,244,225,.3);
+    border-radius:3px;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  a.logout:hover{ border-color: var(--mint); background: rgba(137,215,183,.1); }
+
+  /* ---------- Content ---------- */
+  .page{
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 28px 24px 40px;
+  }
+
+  .page-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    margin-bottom: 18px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--teal);
+    display:block;
+    margin-bottom:8px;
+  }
+
+  h2{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size: 28px;
+    color: var(--forest);
+    margin:0;
+  }
+
+  .count-chip{
+    font-family: var(--font-mono);
+    font-size:12.5px;
+    letter-spacing:.04em;
+    color: var(--teal);
+    background: rgba(66,132,117,.09);
+    border: 1px solid rgba(66,132,117,.25);
+    padding: 6px 12px;
+    border-radius: 3px;
+  }
+
+  .card{
+    background:#fff;
+    border-radius:6px;
+    border: 1px solid rgba(26,49,44,.08);
+    box-shadow: 0 1px 3px rgba(26,49,44,.05);
+    overflow:hidden;
+  }
+
+  table{ width:100%; border-collapse:collapse; table-layout: fixed; }
+  thead th{
+    text-align:left;
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color: var(--teal);
+    padding: 11px 16px;
+    border-bottom: 1.5px solid rgba(66,132,117,.25);
+    background: rgba(137,215,183,.06);
+  }
+  td{
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(26,49,44,.07);
+    font-size: 14.5px;
+    vertical-align: middle;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr{ transition: background .15s ease; }
+  tbody tr:hover{ background: rgba(255,244,225,.6); }
+
+  .row-num{
+    font-family: var(--font-mono);
+    color: #9BA9A3;
+    font-size:12.5px;
+    width: 46px;
+  }
+  .cell-name{ font-weight:600; color: var(--forest); }
+  .cell-email{ color:#5A6E67; font-family: var(--font-mono); font-size:13px; }
+
+  #content table th:last-child,
+  #content table td:last-child{ width: 190px; }
+
+  .actions{ display:flex; gap:6px; }
+  button{
+    padding: 7px 12px;
+    border-radius: 3px;
+    cursor:pointer;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12.5px;
+    letter-spacing:.02em;
+    white-space: nowrap;
+    transition: background .18s ease, color .18s ease, transform .06s ease, box-shadow .18s ease;
+  }
+  button:active{ transform: scale(.96); }
+
+  .approve{
+    background: var(--teal);
+    color:#fff;
+    border: 1px solid var(--teal);
+  }
+  .approve:hover{ background: var(--forest); box-shadow: 0 3px 10px rgba(26,49,44,.25); }
+
+  .reject{
+    background: transparent;
+    color: var(--ink-red);
+    border: 1px solid rgba(166,67,45,.4);
+  }
+  .reject:hover{ background: var(--ink-red); color:#fff; border-color: var(--ink-red); }
+
+  button:disabled{ opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  .section-gap{ height:32px; }
+
+  .cell-subject{ font-weight:600; color: var(--forest); overflow-wrap: break-word; word-break: break-word; }
+  .msg-preview{ max-width: 320px; overflow-wrap: break-word; word-break: break-word; }
+  .msg-preview summary{
+    cursor:pointer;
+    color:#5A6E67;
+    font-size:14px;
+    list-style:none;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  .msg-preview summary::-webkit-details-marker{ display:none; }
+  .msg-preview summary::after{
+    content:"- voir le message";
+    color: var(--teal);
+    font-family: var(--font-mono);
+    font-size:11.5px;
+    margin-left:6px;
+  }
+  .msg-preview[open] summary::after{ content:"- réduire"; }
+  .msg-preview p{
+    margin: 8px 0 0;
+    font-size:13.8px;
+    color: var(--text-on-cream);
+    line-height:1.6;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .cell-date{ font-family: var(--font-mono); font-size:12px; color:#8A9A93; white-space:nowrap; }
+
+  #invoicesContent table th:last-child,
+  #invoicesContent table td:last-child{ width: 190px; }
+
+  .invoice-actions{ display:flex; gap:6px; }
+  .btn-download{
+    background: transparent;
+    color: var(--teal);
+    border: 1px solid rgba(66,132,117,.35);
+  }
+  .btn-download:hover{ background: var(--teal); color:#fff; }
+
+  .delete-msg{
+    background: transparent;
+    color: var(--ink-red);
+    border: 1px solid rgba(166,67,45,.4);
+    white-space: nowrap;
+  }
+  .delete-msg:hover{ background: var(--ink-red); color:#fff; border-color: var(--ink-red); }
+
+  .empty, .loading, .error-state{
+    padding: 48px 20px;
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size:13px;
+    color:#8A9A93;
+  }
+  .error-state{ color: var(--ink-red); }
+
+  /* ---------- Confirm modal ---------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background: rgba(18,36,32,.55);
+    backdrop-filter: blur(2px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:1000;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .16s ease;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+
+  .modal-box{
+    background:#fff;
+    border-radius:8px;
+    max-width: 380px;
+    width:100%;
+    padding: 26px 26px 20px;
+    box-shadow: 0 12px 36px rgba(18,36,32,.28);
+    transform: translateY(6px) scale(.98);
+    transition: transform .16s ease;
+  }
+  .modal-overlay.open .modal-box{ transform: translateY(0) scale(1); }
+
+  .modal-eyebrow{
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--ink-red);
+    display:block;
+    margin-bottom:8px;
+  }
+  .modal-box h3{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:19px;
+    color: var(--forest);
+    margin:0 0 10px;
+  }
+  .modal-box p{
+    font-size:14px;
+    line-height:1.55;
+    color:#5A6E67;
+    margin:0 0 22px;
+  }
+  .modal-box p strong{ color: var(--text-on-cream); }
+
+  .modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+  }
+  .modal-cancel{
+    background: transparent;
+    color: var(--text-on-cream);
+    border: 1px solid rgba(26,49,44,.18);
+  }
+  .modal-cancel:hover{ background: rgba(26,49,44,.05); }
+  .modal-confirm{
+    background: var(--ink-red);
+    color:#fff;
+    border: 1px solid var(--ink-red);
+  }
+  .modal-confirm:hover{ background:#8a3626; }
+
+  :focus-visible{ outline: 2px solid var(--mint); outline-offset: 2px; }
+
+  @media (max-width: 640px){
+    .topbar{ padding:14px 20px; }
+    .page{ padding: 32px 16px 48px; }
+    thead{ display:none; }
+    table, tbody, tr, td{ display:block; width:100%; }
+    tr{ padding: 16px 4px; border-bottom:1px solid rgba(26,49,44,.08); }
+    td{ border:none; padding:4px 16px; }
+    .row-num{ display:none; }
+    .actions{ padding-top:8px; }
+    .msg-preview{ max-width:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand-lockup">
+    <svg class="mini-seal" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="18.5" fill="none" stroke="#89D7B7" stroke-opacity=".55" stroke-width="1"/>
+      <circle cx="20" cy="20" r="12.5" fill="none" stroke="#FFF4E1" stroke-opacity=".85" stroke-width="1"/>
+      <text x="20" y="24" text-anchor="middle" font-family="Fraunces, serif" font-weight="600" font-size="9" fill="#FFF4E1">CB</text>
+    </svg>
+    <div class="brand-text">
+      <span class="name">CBSB</span>
+      <span class="sep">/</span>
+      <span class="zone">Administration</span>
+    </div>
+  </div>
+  <a href="login" class="logout" onclick="sessionStorage.clear()">Se déconnecter</a>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">Gestion des accès</span>
+      <h2>Comptes en attente de validation</h2>
+    </div>
+    <span class="count-chip" id="countChip">- dossiers</span>
+  </div>
+
+  <div class="card">
+    <div id="content"><p class="loading">Chargement des dossiers...</p></div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">Boîte de réception</span>
+      <h2>Messages clients</h2>
+    </div>
+    <span class="count-chip" id="msgCountChip">- messages</span>
+  </div>
+
+  <div class="card">
+    <div id="messagesContent"><p class="loading">Chargement des messages...</p></div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">Documents</span>
+      <h2>Factures clients</h2>
+    </div>
+    <span class="count-chip" id="invoiceCountChip">- factures</span>
+  </div>
+
+  <div class="card">
+    <div id="invoicesContent"><p class="loading">Chargement des factures...</p></div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-box">
+    <span class="modal-eyebrow" id="confirmEyebrow">Action requise</span>
+    <h3 id="confirmTitle">Confirmer l'action</h3>
+    <p id="confirmText">Êtes-vous sûr ?</p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeConfirm()">Annuler</button>
+      <button class="modal-confirm" id="confirmBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+const token = sessionStorage.getItem("token");
+
+if (!token || sessionStorage.getItem("role") !== "admin") {
+  window.location.href = "/login";
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML;
+}
+
+const confirmOverlay = document.getElementById("confirmOverlay");
+const confirmTitle = document.getElementById("confirmTitle");
+const confirmText = document.getElementById("confirmText");
+const confirmBtn = document.getElementById("confirmBtn");
+
+function openConfirm({ title, text, onConfirm }) {
+  confirmTitle.textContent = title;
+  confirmText.innerHTML = text;
+  confirmBtn.onclick = () => {
+    closeConfirm();
+    onConfirm();
+  };
+  confirmOverlay.classList.add("open");
+}
+
+function closeConfirm() {
+  confirmOverlay.classList.remove("open");
+  confirmBtn.onclick = null;
+}
+
+confirmOverlay.addEventListener("click", (e) => {
+  if (e.target === confirmOverlay) closeConfirm();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeConfirm();
+});
+
+async function loadPending() {
+  const content = document.getElementById("content");
+  const countChip = document.getElementById("countChip");
+  try {
+    const res = await fetch(`${API_BASE}/admin/pending-users`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const users = await res.json();
+    if (!res.ok) throw new Error(users.detail);
+
+    countChip.textContent = users.length === 0
+      ? "0 dossier"
+      : `${users.length} dossier${users.length > 1 ? "s" : ""} en attente`;
+
+    if (users.length === 0) {
+      content.innerHTML = '<p class="empty">Aucune demande en attente pour le moment.</p>';
+      return;
+    }
+
+    let html = `<table>
+      <thead><tr>
+        <th>N°</th><th>Nom</th><th>Entreprise</th><th>Email</th><th>Actions</th>
+      </tr></thead><tbody>`;
+
+    users.forEach((u, i) => {
+      const ref = String(i + 1).padStart(3, "0");
+      html += `<tr>
+        <td class="row-num">${ref}</td>
+        <td class="cell-name">${escapeHtml(u.full_name) || "-"}</td>
+        <td>${escapeHtml(u.company_name) || "-"}</td>
+        <td class="cell-email">${escapeHtml(u.email)}</td>
+        <td>
+          <div class="actions">
+            <button class="approve" onclick="approve(${u.id}, this)">Valider</button>
+            <button class="reject" onclick="reject(${u.id}, this)">Rejeter</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function approve(id, btn) {
+  const row = btn.closest("tr");
+  row.querySelectorAll("button").forEach(b => b.disabled = true);
+  try {
+    await fetch(`${API_BASE}/admin/approve-user/${id}`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+  } finally {
+    loadPending();
+  }
+}
+
+async function reject(id, btn) {
+  const row = btn.closest("tr");
+  const name = row.querySelector(".cell-name")?.textContent || "ce dossier";
+  openConfirm({
+    title: "Rejeter le dossier",
+    text: `Voulez-vous vraiment rejeter la demande de <strong>${escapeHtml(name)}</strong> ? Cette action est irréversible.`,
+    onConfirm: async () => {
+      row.querySelectorAll("button").forEach(b => b.disabled = true);
+      try {
+        await fetch(`${API_BASE}/admin/reject-user/${id}`, {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } finally {
+        loadPending();
+      }
+    }
+  });
+}
+
+function formatDate(iso) {
+  try {
+    return new Date(iso).toLocaleString("fr-FR", {
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit"
+    });
+  } catch {
+    return iso;
+  }
+}
+
+async function loadMessages() {
+  const content = document.getElementById("messagesContent");
+  const countChip = document.getElementById("msgCountChip");
+  try {
+    const res = await fetch(`${API_BASE}/admin/contact-messages`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const messages = await res.json();
+    if (!res.ok) throw new Error(messages.detail);
+
+    countChip.textContent = messages.length === 0
+      ? "0 message"
+      : `${messages.length} message${messages.length > 1 ? "s" : ""}`;
+
+    if (messages.length === 0) {
+      content.innerHTML = '<p class="empty">Aucun message reçu pour le moment.</p>';
+      return;
+    }
+
+    let html = `<table>
+      <thead><tr>
+        <th>N°</th><th>Nom</th><th>Email</th><th>Sujet</th><th>Message</th><th>Reçu le</th><th></th>
+      </tr></thead><tbody>`;
+
+    messages.forEach((m, i) => {
+      const ref = String(i + 1).padStart(3, "0");
+      html += `<tr>
+        <td class="row-num">${ref}</td>
+        <td class="cell-name">${escapeHtml(m.name)}</td>
+        <td class="cell-email"><a href="mailto:${escapeHtml(m.email)}" style="color:inherit;">${escapeHtml(m.email)}</a></td>
+        <td class="cell-subject">${escapeHtml(m.subject)}</td>
+        <td class="msg-preview">
+          <details>
+            <summary>${escapeHtml(m.message.slice(0, 40))}${m.message.length > 40 ? "…" : ""}</summary>
+            <p>${escapeHtml(m.message)}</p>
+          </details>
+        </td>
+        <td class="cell-date">${formatDate(m.created_at)}</td>
+        <td>
+          <button class="delete-msg" onclick="deleteMessage(${m.id}, this)">Supprimer</button>
+        </td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function deleteMessage(id, btn) {
+  const row = btn.closest("tr");
+  const name = row.querySelector(".cell-name")?.textContent || "ce message";
+  openConfirm({
+    title: "Supprimer le message",
+    text: `Voulez-vous vraiment supprimer le message de <strong>${escapeHtml(name)}</strong> ? Cette action est irréversible.`,
+    onConfirm: async () => {
+      btn.disabled = true;
+      try {
+        await fetch(`${API_BASE}/admin/contact-messages/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } finally {
+        loadMessages();
+      }
+    }
+  });
+}
+
+/* ---------- Invoices ---------- */
+async function loadInvoices() {
+  const content = document.getElementById("invoicesContent");
+  const countChip = document.getElementById("invoiceCountChip");
+  try {
+    const res = await fetch(`${API_BASE}/admin/invoices`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const invoices = await res.json();
+    if (!res.ok) throw new Error(invoices.detail);
+
+    countChip.textContent = invoices.length === 0
+      ? "0 facture"
+      : `${invoices.length} facture${invoices.length > 1 ? "s" : ""}`;
+
+    if (invoices.length === 0) {
+      content.innerHTML = '<p class="empty">Aucune facture reçue pour le moment.</p>';
+      return;
+    }
+
+    let html = `<table>
+      <thead><tr>
+        <th>N°</th><th>Client</th><th>Entreprise</th><th>Fichier</th><th>Reçu le</th><th></th>
+      </tr></thead><tbody>`;
+
+    invoices.forEach((inv, i) => {
+      const ref = String(i + 1).padStart(3, "0");
+      html += `<tr>
+        <td class="row-num">${ref}</td>
+        <td class="cell-name">${escapeHtml(inv.client_name) || "-"}</td>
+        <td>${escapeHtml(inv.company_name) || "-"}</td>
+        <td class="cell-subject">${escapeHtml(inv.filename)}</td>
+        <td class="cell-date">${formatDate(inv.uploaded_at)}</td>
+        <td>
+          <div class="invoice-actions">
+            <button class="btn-download" onclick="downloadInvoice(${inv.id}, this)">Télécharger</button>
+            <button class="delete-msg" onclick="confirmDeleteInvoice(${inv.id}, this)">Supprimer</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function downloadInvoice(id, btn) {
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/admin/invoices/${id}/download`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Téléchargement impossible.");
+    const blob = await res.blob();
+    const cd = res.headers.get("Content-Disposition") || "";
+    const match = cd.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : "facture.pdf";
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function confirmDeleteInvoice(id, btn) {
+  const row = btn.closest("tr");
+  const filename = row.querySelector(".cell-subject")?.textContent || "cette facture";
+  openConfirm({
+    title: "Supprimer la facture",
+    text: `Voulez-vous vraiment supprimer <strong>${escapeHtml(filename)}</strong> ? Cette action est irréversible.`,
+    onConfirm: async () => {
+      row.querySelectorAll("button").forEach(b => b.disabled = true);
+      try {
+        await fetch(`${API_BASE}/admin/invoices/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } finally {
+        loadInvoices();
+      }
+    }
+  });
+}
+
+loadPending();
+loadMessages();
+loadInvoices();
+</script>
+</body>
+</html>

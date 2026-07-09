@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Activer mon compte</title>
+<style>
+  body { font-family: sans-serif; background:#eef1f4; display:flex;
+         align-items:center; justify-content:center; height:100vh; margin:0; }
+  .box { background:#fff; padding:32px; border-radius:8px; width:340px;
+         box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  input { width:100%; padding:9px; margin-bottom:12px; border:1px solid #ccc;
+          border-radius:5px; box-sizing:border-box; }
+  button { width:100%; padding:10px; background:#16233a; color:#fff;
+           border:none; border-radius:5px; cursor:pointer; }
+  p { font-size:13px; }
+</style>
+</head>
+<body>
+<div class="box" id="app">
+  <h2>Definir votre mot de passe</h2>
+  <input type="password" id="password" placeholder="Nouveau mot de passe" />
+  <button onclick="activate()">Activer mon compte</button>
+  <p id="msg"></p>
+</div>
+
+<script>
+const API_BASE = "http://localhost:8000";
+
+const params = new URLSearchParams(window.location.search);
+const token = params.get("token");
+
+async function activate() {
+  const password = document.getElementById("password").value;
+  try {
+    const res = await fetch(`${API_BASE}/auth/activate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+    document.getElementById("msg").textContent = data.detail;
+  } catch (err) {
+    document.getElementById("msg").textContent = err.message;
+  }
+}
+</script>
+</body>
+</html>
