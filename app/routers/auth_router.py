@@ -13,9 +13,13 @@ def register(payload: schemas.RegisterRequest, db: Session = Depends(get_db)):
     existing = db.query(models.User).filter(models.User.email == payload.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Cet email est deja utilise")
+    existing = db.query(models.User).filter(models.User.matricule_fiscal == payload.matricule_fiscal).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Ce matricule fiscal est deja utilise")
 
     user = models.User(
     email=payload.email,
+    matricule_fiscal=payload.matricule_fiscal,
     full_name=payload.full_name,
     company_name=payload.company_name,
     password_hash=auth_utils.hash_password(payload.password),
@@ -46,12 +50,12 @@ def activate(payload: schemas.ActivateRequest, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=schemas.Token)
 def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == payload.email).first()
+    user = db.query(models.User).filter(models.User.matricule_fiscal == payload.matricule_fiscal).first()
 
     if not user or not user.password_hash:
-        raise HTTPException(status_code=400, detail="Email ou mot de passe incorrect")
+        raise HTTPException(status_code=400, detail="Matricule fiscal ou mot de passe incorrect")
     if not auth_utils.verify_password(payload.password, user.password_hash):
-        raise HTTPException(status_code=400, detail="Email ou mot de passe incorrect")
+        raise HTTPException(status_code=400, detail="Matricule fiscal ou mot de passe incorrect")
     if user.status == models.StatusEnum.pending:
         raise HTTPException(status_code=403, detail="Compte en attente de validation")
     if user.status == models.StatusEnum.rejected:

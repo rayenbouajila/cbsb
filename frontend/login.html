@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Connexion — CBSB</title>
+<title>Connexion - CBSB</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -249,7 +249,7 @@
     <div class="brand-mark">
       <span class="eyebrow">Cabinet d'expertise comptable</span>
       <h1 class="wordmark">CBSB</h1>
-      <p class="tagline">Ben Said Belgacem — la rigueur des chiffres, la clarté du conseil.</p>
+      <p class="tagline">Ben Said Belgacem - la rigueur des chiffres, la clarté du conseil.</p>
     </div>
 
     <div>
@@ -270,7 +270,7 @@
       </div>
     </div>
 
-    <span class="dossier">Réf. plateforme — connexion sécurisée</span>
+    <span class="dossier">Réf. plateforme - connexion sécurisée</span>
   </aside>
 
   <main class="form-panel">
@@ -280,9 +280,9 @@
       <div class="error" id="error"></div>
 
       <div class="field">
-        <label class="field-label" for="email">Email</label>
-        <input type="email" id="email" placeholder="nom@exemple.com" required />
-        <div class="field-error" id="email-error"></div>
+        <label class="field-label" for="matricule_fiscal">matricule fiscal</label>
+        <input type="text" id="matricule_fiscal" placeholder="123456789" required />
+        <div class="field-error" id="matricule_fiscal-error"></div>
       </div>
 
       <div class="field">
@@ -300,7 +300,6 @@
 
 <script>
 const API_BASE = "http://127.0.0.1:8000";
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function setFieldError(id, message) {
   const input = document.getElementById(id);
@@ -311,17 +310,14 @@ function setFieldError(id, message) {
 
 function validateLoginForm() {
   let valid = true;
-  const email = document.getElementById("email").value.trim();
+  const matricule_fiscal = document.getElementById("matricule_fiscal").value.trim();
   const password = document.getElementById("password").value;
 
-  if (!email) {
-    setFieldError("email", "L'email est requis.");
-    valid = false;
-  } else if (!EMAIL_REGEX.test(email)) {
-    setFieldError("email", "Format d'email invalide.");
+  if (!matricule_fiscal) {
+    setFieldError("matricule_fiscal", "Le matricule fiscal est requis.");
     valid = false;
   } else {
-    setFieldError("email", "");
+    setFieldError("matricule_fiscal", "");
   }
 
   if (!password) {
@@ -337,7 +333,7 @@ function validateLoginForm() {
   return valid;
 }
 
-document.getElementById("email").addEventListener("blur", validateLoginForm);
+document.getElementById("matricule_fiscal").addEventListener("blur", validateLoginForm);
 document.getElementById("password").addEventListener("blur", validateLoginForm);
 
 async function login() {
@@ -346,7 +342,7 @@ async function login() {
 
   if (!validateLoginForm()) return;
 
-  const email = document.getElementById("email").value.trim();
+  const matricule_fiscal = document.getElementById("matricule_fiscal").value.trim();
   const password = document.getElementById("password").value;
   const btn = document.getElementById("submitBtn");
 
@@ -357,7 +353,7 @@ async function login() {
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ matricule_fiscal, password })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Échec de la connexion.");

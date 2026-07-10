@@ -318,7 +318,11 @@
           <div class="field-error" id="companyName-error"></div>
         </div>
       </div>
-
+      <div class="field">
+        <label class="field-label" for="matricule_fiscal">Matricule fiscal</label>
+        <input type="text" id="matricule_fiscal" placeholder="1234567X" required />
+        <div class="field-error" id="matricule_fiscal-error"></div>
+      </div>
       <div class="field">
         <label class="field-label" for="email">Email</label>
         <input type="email" id="email" placeholder="nom@exemple.com" required />
@@ -361,6 +365,7 @@ function validateSignupForm() {
   let valid = true;
 
   const fullName = document.getElementById("fullName").value.trim();
+  const matriculeFiscal = document.getElementById("matricule_fiscal").value.trim();
   const companyName = document.getElementById("companyName").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
@@ -416,7 +421,7 @@ function validateSignupForm() {
   return valid;
 }
 
-["fullName", "companyName", "email", "password", "confirmPassword"].forEach(id => {
+["fullName","matricule_fiscal", "companyName", "email", "password", "confirmPassword"].forEach(id => {
   document.getElementById(id).addEventListener("blur", validateSignupForm);
 });
 
@@ -428,6 +433,7 @@ async function signup() {
   if (!validateSignupForm()) return;
 
   const full_name = document.getElementById("fullName").value.trim();
+  const matricule_fiscal = document.getElementById("matricule_fiscal").value.trim();
   const company_name = document.getElementById("companyName").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
@@ -440,7 +446,7 @@ async function signup() {
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, full_name, company_name, password })
+      body: JSON.stringify({ email, matricule_fiscal, full_name, company_name, password })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Échec de l'inscription.");

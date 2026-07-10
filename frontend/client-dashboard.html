@@ -172,6 +172,45 @@
     text-align:center;
   }
 
+  /* ---------- Requested documents ---------- */
+  .requests-card{
+    background:#fff;
+    border-radius:6px;
+    border: 1px solid rgba(26,49,44,.08);
+    border-left: 4px solid var(--ink-red);
+    box-shadow: 0 1px 3px rgba(26,49,44,.05);
+    overflow:hidden;
+  }
+  .request-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 15px 20px;
+    border-top: 1px solid rgba(26,49,44,.07);
+    gap: 14px;
+  }
+  .request-row:first-child{ border-top:none; }
+  .request-info{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .request-type{ font-weight:600; font-size:14px; color: var(--forest); }
+  .request-note{ font-size:12.5px; color:#5A6E67; }
+  .request-date{ font-family: var(--font-mono); font-size:11px; color:#8A9A93; }
+  .btn-fulfill{
+    background: var(--teal);
+    color:#fff;
+    border: 1px solid var(--teal);
+    padding: 7px 14px;
+    border-radius:3px;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12.5px;
+    cursor:pointer;
+    white-space:nowrap;
+    flex-shrink:0;
+    transition: background .18s ease;
+  }
+  .btn-fulfill:hover{ background: var(--forest); }
+  .btn-fulfill:disabled{ opacity:.5; cursor:not-allowed; }
+
   /* ---------- Invoices card ---------- */
   .invoices-card{
     background:#fff;
@@ -182,13 +221,28 @@
     overflow:hidden;
   }
 
+  .doc-type-picker{ padding: 18px 20px 0; }
+  .doc-type-select{
+    width:100%;
+    padding: 9px 12px;
+    border-radius:4px;
+    border: 1px solid rgba(26,49,44,.18);
+    background:#fff;
+    color: var(--text-on-cream);
+    font-family: var(--font-body);
+    font-size:13.5px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .doc-type-select:focus-visible{ outline: 2px solid var(--mint); outline-offset:1px; }
+
   .upload-zone{
     border: 1.5px dashed rgba(66,132,117,.4);
     border-radius:6px;
-    padding: 24px 18px;
+    padding: 22px 18px;
     text-align:center;
     cursor:pointer;
-    margin: 18px 20px 6px;
+    margin: 14px 20px 6px;
     transition: border-color .18s ease, background .18s ease;
   }
   .upload-zone:hover, .upload-zone.dragover{
@@ -245,11 +299,27 @@
     text-overflow:ellipsis;
     max-width: 260px;
   }
+  .invoice-meta{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:3px;
+  }
+  .doctype-pill{
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(66,132,117,.1);
+    color: var(--teal);
+    border: 1px solid rgba(66,132,117,.25);
+    white-space:nowrap;
+  }
   .invoice-date{
     font-family: var(--font-mono);
     font-size:11px;
     color:#8A9A93;
-    margin-top:2px;
   }
 
   .invoice-actions{ display:flex; gap:6px; flex-shrink:0; }
@@ -364,6 +434,7 @@
     .row{ padding: 16px 18px; }
     .invoice-row{ flex-wrap:wrap; }
     .invoice-name{ max-width: 180px; }
+    .request-row{ flex-wrap:wrap; }
   }
 </style>
 </head>
@@ -393,10 +464,22 @@
     <div id="info"><p class="loading">Chargement de votre profil...</p></div>
   </div>
 
+  <div id="requestsWrap" style="display:none;">
+    <div class="section-gap"></div>
+    <h3 class="section-title">Documents demandés</h3>
+    <div class="requests-card">
+      <div id="requestsList"></div>
+    </div>
+  </div>
+
   <div class="section-gap"></div>
 
-  <h3 class="section-title">Mes factures</h3>
+  <h3 class="section-title">Mes documents</h3>
   <div class="invoices-card">
+    <div class="doc-type-picker">
+      <span class="row-label" style="display:block;margin-bottom:6px;">Type de document</span>
+      <select id="docTypeSelect" class="doc-type-select"></select>
+    </div>
     <div class="upload-zone" id="uploadZone">
       <input type="file" id="fileInput" accept="application/pdf,.pdf">
       <svg class="upload-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M6 10l6-6 6 6"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
@@ -404,7 +487,7 @@
       <div class="upload-sub">Format PDF uniquement · 10 Mo max</div>
     </div>
     <p class="upload-status" id="uploadStatus"></p>
-    <div class="invoices-list" id="invoicesList"><p class="invoices-empty">Chargement de vos factures...</p></div>
+    <div class="invoices-list" id="invoicesList"><p class="invoices-empty">Chargement de vos documents...</p></div>
   </div>
 
   <p class="footnote">Cabinet Ben Said Belgacem - Kébili, Tunisie</p>
@@ -426,6 +509,20 @@
 const API_BASE = "http://127.0.0.1:8000";
 const token = sessionStorage.getItem("token");
 const MAX_SIZE = 10 * 1024 * 1024; // 10 Mo
+
+const DOC_TYPES = [
+  { value: "purchase_invoice", label: "Factures d'achat" },
+  { value: "sales_invoice", label: "Factures de vente" },
+  { value: "bank_statement", label: "Relevés bancaires" },
+  { value: "tax_declaration", label: "Déclarations fiscales" },
+  { value: "payslip", label: "Bulletins de paie" },
+  { value: "contract", label: "Contrats" },
+];
+
+function docTypeLabel(value) {
+  const found = DOC_TYPES.find(d => d.value === value);
+  return found ? found.label : value;
+}
 
 if (!token) {
   window.location.href = "/login";
@@ -520,8 +617,46 @@ async function loadProfile() {
   }
 }
 
-/* ---------- Invoices ---------- */
+/* ---------- Document requests from admin ---------- */
+async function loadDocumentRequests() {
+  const wrap = document.getElementById("requestsWrap");
+  const list = document.getElementById("requestsList");
+  try {
+    const res = await fetch(`${API_BASE}/client/document-requests`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const requests = await res.json();
+    if (!res.ok) throw new Error(requests.detail);
+
+    if (requests.length === 0) {
+      wrap.style.display = "none";
+      return;
+    }
+
+    wrap.style.display = "block";
+    list.innerHTML = requests.map(r => `
+      <div class="request-row" data-id="${r.id}">
+        <div class="request-info">
+          <span class="request-type">${escapeHtml(docTypeLabel(r.doc_type))}</span>
+          ${r.note ? `<span class="request-note">${escapeHtml(r.note)}</span>` : ""}
+          <span class="request-date">Demandé le ${formatDate(r.created_at)}</span>
+        </div>
+        <button class="btn-fulfill" onclick="triggerUploadForRequest(${r.id}, '${r.doc_type}')">Uploader</button>
+      </div>
+    `).join("");
+  } catch (err) {
+    wrap.style.display = "block";
+    list.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+/* ---------- Invoices / documents ---------- */
 const pdfIconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M15 2v5h5"/></svg>`;
+
+function populateDocTypeSelect() {
+  const select = document.getElementById("docTypeSelect");
+  select.innerHTML = DOC_TYPES.map(d => `<option value="${d.value}">${escapeHtml(d.label)}</option>`).join("");
+}
 
 async function loadInvoices() {
   const wrap = document.getElementById("invoicesList");
@@ -533,7 +668,7 @@ async function loadInvoices() {
     if (!res.ok) throw new Error(invoices.detail);
 
     if (invoices.length === 0) {
-      wrap.innerHTML = '<p class="invoices-empty">Aucune facture envoyée pour le moment.</p>';
+      wrap.innerHTML = '<p class="invoices-empty">Aucun document envoyé pour le moment.</p>';
       return;
     }
 
@@ -543,7 +678,10 @@ async function loadInvoices() {
           <span class="invoice-icon">${pdfIconSvg}</span>
           <div>
             <div class="invoice-name">${escapeHtml(inv.filename)}</div>
-            <div class="invoice-date">${formatDate(inv.uploaded_at)}</div>
+            <div class="invoice-meta">
+              <span class="doctype-pill">${escapeHtml(docTypeLabel(inv.doc_type))}</span>
+              <span class="invoice-date">${formatDate(inv.uploaded_at)}</span>
+            </div>
           </div>
         </div>
         <div class="invoice-actions">
@@ -563,6 +701,8 @@ function setUploadStatus(text, kind) {
   status.className = "upload-status" + (kind ? " " + kind : "");
 }
 
+let uploadContext = null; // { requestId, docType } when fulfilling a specific request, else null
+
 async function uploadInvoice(file) {
   if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
     setUploadStatus("Seuls les fichiers PDF sont acceptés.", "error");
@@ -573,10 +713,15 @@ async function uploadInvoice(file) {
     return;
   }
 
+  const docType = uploadContext ? uploadContext.docType : document.getElementById("docTypeSelect").value;
+  const requestId = uploadContext ? uploadContext.requestId : null;
+
   setUploadStatus(`Envoi de "${file.name}"...`, "uploading");
 
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("doc_type", docType);
+  if (requestId) formData.append("request_id", requestId);
 
   try {
     const res = await fetch(`${API_BASE}/client/invoices`, {
@@ -585,14 +730,21 @@ async function uploadInvoice(file) {
       body: formData
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.detail || "Échec de l'envoi de la facture.");
+    if (!res.ok) throw new Error(data.detail || "Échec de l'envoi du document.");
 
-    setUploadStatus("Facture envoyée avec succès.", "success");
+    setUploadStatus("Document envoyé avec succès.", "success");
+    uploadContext = null;
     loadInvoices();
+    loadDocumentRequests();
     setTimeout(() => setUploadStatus(""), 3000);
   } catch (err) {
     setUploadStatus(`Erreur : ${err.message}`, "error");
   }
+}
+
+function triggerUploadForRequest(requestId, docType) {
+  uploadContext = { requestId, docType };
+  document.getElementById("fileInput").click();
 }
 
 async function downloadInvoice(id, btn) {
@@ -605,7 +757,7 @@ async function downloadInvoice(id, btn) {
     const blob = await res.blob();
     const cd = res.headers.get("Content-Disposition") || "";
     const match = cd.match(/filename="?([^"]+)"?/);
-    const filename = match ? match[1] : "facture.pdf";
+    const filename = match ? match[1] : "document.pdf";
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -622,9 +774,9 @@ async function downloadInvoice(id, btn) {
 }
 
 function confirmDeleteInvoice(id, btn) {
-  const name = btn.closest(".invoice-row").querySelector(".invoice-name")?.textContent || "cette facture";
+  const name = btn.closest(".invoice-row").querySelector(".invoice-name")?.textContent || "ce document";
   openConfirm({
-    title: "Supprimer la facture",
+    title: "Supprimer le document",
     text: `Voulez-vous vraiment supprimer <strong>${escapeHtml(name)}</strong> ? Cette action est irréversible.`,
     onConfirm: async () => {
       btn.disabled = true;
@@ -644,7 +796,10 @@ function confirmDeleteInvoice(id, btn) {
 const uploadZone = document.getElementById("uploadZone");
 const fileInput = document.getElementById("fileInput");
 
-uploadZone.addEventListener("click", () => fileInput.click());
+uploadZone.addEventListener("click", () => {
+  uploadContext = null;
+  fileInput.click();
+});
 fileInput.addEventListener("change", () => {
   if (fileInput.files[0]) uploadInvoice(fileInput.files[0]);
   fileInput.value = "";
@@ -663,11 +818,14 @@ fileInput.addEventListener("change", () => {
   })
 );
 uploadZone.addEventListener("drop", (e) => {
+  uploadContext = null;
   const file = e.dataTransfer.files[0];
   if (file) uploadInvoice(file);
 });
 
+populateDocTypeSelect();
 loadProfile();
+loadDocumentRequests();
 loadInvoices();
 </script>
 </body>
