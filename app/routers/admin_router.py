@@ -1,26 +1,17 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException,Query
 from sqlalchemy.orm import Session
-
 from .. import models, schemas, auth_utils
 from ..database import get_db
-
 from pathlib import Path
 from typing import List, Optional
 from fastapi import Query
 from fastapi.responses import FileResponse
 
-
-
-
 router = APIRouter(prefix="/admin", tags=["admin"])
-
-
 @router.get("/pending-users", response_model=List[schemas.UserOut])
 def pending_users(db: Session = Depends(get_db), _: models.User = Depends(auth_utils.require_admin)):
     return db.query(models.User).filter(models.User.status == models.StatusEnum.pending).all()
-
-
 @router.post("/approve-user/{user_id}")
 def approve_user(user_id: int, db: Session = Depends(get_db), _: models.User = Depends(auth_utils.require_admin)):
     user = db.query(models.User).filter(models.User.id == user_id).first()
