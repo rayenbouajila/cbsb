@@ -15,7 +15,6 @@ class StatusEnum(str, enum.Enum):
     active = "active"
     rejected = "rejected"
 
-
 class User(Base):
     __tablename__ = "users"
 
@@ -80,3 +79,25 @@ class DocumentRequest(Base):
 
     client = relationship("User", backref="document_requests")
     fulfilled_invoice = relationship("Invoice")
+
+class DeliverableTypeEnum(str, enum.Enum):
+    bilan = "bilan"
+    liasse_fiscale = "liasse_fiscale"
+    rapport = "rapport"
+    autre = "autre"
+
+
+class Deliverable(Base):
+    __tablename__ = "deliverables"
+
+    id = Column(Integer, primary_key=True, index=True)
+    filename = Column(String, nullable=False)
+    stored_filename = Column(String, nullable=False, unique=True)
+    content_type = Column(String, nullable=False, default="application/pdf")
+    doc_type = Column(Enum(DeliverableTypeEnum), nullable=False, default=DeliverableTypeEnum.autre)
+    note = Column(String, nullable=True)
+    size = Column(Integer, nullable=False)
+    client_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    client = relationship("User", backref="deliverables")

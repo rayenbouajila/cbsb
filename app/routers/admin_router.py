@@ -122,8 +122,6 @@ def admin_list_clients(db: Session = Depends(get_db), admin=Depends(auth_utils.r
         .order_by(models.User.full_name)
         .all()
     )
-
-
 @router.post("/document-requests", response_model=schemas.DocumentRequestOut)
 def admin_create_document_request(
     payload: schemas.DocumentRequestCreate,

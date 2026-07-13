@@ -154,7 +154,10 @@
     font-family: var(--font-mono);
     color: #9BA9A3;
     font-size:12.5px;
-    width: 46px;
+    width: 56px;
+    white-space: nowrap;
+    padding-left: 12px;
+    padding-right: 6px;
   }
   .cell-name{ font-weight:600; color: var(--forest); }
   .cell-email{ color:#5A6E67; font-family: var(--font-mono); font-size:13px; }
@@ -223,7 +226,7 @@
     word-break: break-word;
   }
 
-  .cell-date{ font-family: var(--font-mono); font-size:12px; color:#8A9A93; white-space:nowrap; }
+  .cell-date{ font-family: var(--font-mono); font-size:12px; color:#8A9A93; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
   /* ---------- Invoices ---------- */
   .filter-bar{
@@ -262,9 +265,17 @@
   .request-btn:hover{ background: var(--forest); }
 
   #invoicesContent table th:nth-child(4),
-  #invoicesContent table td:nth-child(4){ width: 150px; }
+  #invoicesContent table td:nth-child(4),
+  #deliverablesContent table th:nth-child(4),
+  #deliverablesContent table td:nth-child(4){ width: 130px; }
+  #invoicesContent table th:nth-child(6),
+  #invoicesContent table td:nth-child(6),
+  #deliverablesContent table th:nth-child(6),
+  #deliverablesContent table td:nth-child(6){ width: 125px; }
   #invoicesContent table th:last-child,
-  #invoicesContent table td:last-child{ width: 190px; }
+  #invoicesContent table td:last-child,
+  #deliverablesContent table th:last-child,
+  #deliverablesContent table td:last-child{ width: 195px; }
 
   .doctype-badge{
     font-family: var(--font-mono);
@@ -278,7 +289,59 @@
     display:inline-block;
   }
 
-  .invoice-actions{ display:flex; gap:6px; }
+  .note-sub{
+    font-size:12px;
+    font-weight:400;
+    color:#5A6E67;
+    margin-top:2px;
+  }
+
+  /* ---------- Deliverables (accountant -> client uploads) ---------- */
+  .deliverable-upload{ padding: 18px 20px 6px; }
+  .deliverable-upload-row{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .deliverable-upload-row .form-group{ flex:1; min-width:200px; margin-bottom:0; }
+
+  .upload-zone{
+    border: 1.5px dashed rgba(66,132,117,.4);
+    border-radius:6px;
+    padding: 22px 18px;
+    text-align:center;
+    cursor:pointer;
+    margin: 0 0 6px;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  .upload-zone:hover, .upload-zone.dragover{
+    border-color: var(--teal);
+    background: rgba(137,215,183,.08);
+  }
+  .upload-zone input[type="file"]{ display:none; }
+  .upload-icon{ color: var(--teal); margin: 0 auto 8px; display:block; }
+  .upload-text{ font-size:13.5px; font-weight:600; color: var(--text-on-cream); }
+  .upload-sub{
+    font-family: var(--font-mono);
+    font-size:11px;
+    color:#8A9A93;
+    margin-top:4px;
+    letter-spacing:.02em;
+  }
+  .upload-status{
+    font-family: var(--font-mono);
+    font-size:12px;
+    text-align:center;
+    margin: 0 0 14px;
+    min-height:16px;
+  }
+  .upload-status.uploading{ color: var(--teal); }
+  .upload-status.success{ color: var(--teal); }
+  .upload-status.error{ color: var(--ink-red); }
+
+  .invoice-actions{ display:flex; gap:5px; flex-wrap:wrap; }
+  .invoice-actions button{ padding: 6px 9px; font-size: 11.5px; }
   .btn-download{
     background: transparent;
     color: var(--teal);
@@ -481,6 +544,51 @@
   <div class="card">
     <div id="invoicesContent"><p class="loading">Chargement des documents...</p></div>
   </div>
+
+  <div class="section-gap"></div>
+
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">Documents du cabinet</span>
+      <h2>Livrables envoyés aux clients</h2>
+    </div>
+    <span class="count-chip" id="deliverableCountChip">- livrables</span>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="deliverable-upload">
+      <div class="deliverable-upload-row">
+        <div class="form-group">
+          <label class="form-label">Client</label>
+          <select id="deliverableClientSelect" class="form-select"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type de document</label>
+          <select id="deliverableTypeSelect" class="form-select"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Note (optionnel)</label>
+        <input type="text" id="deliverableNote" class="form-select" style="width:100%;" placeholder="Ex. Bilan exercice 2024">
+      </div>
+      <div class="upload-zone" id="deliverableUploadZone">
+        <input type="file" id="deliverableFileInput" accept="application/pdf,.pdf">
+        <svg class="upload-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M6 10l6-6 6 6"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        <div class="upload-text">Glissez un PDF ici ou cliquez pour parcourir</div>
+        <div class="upload-sub">Format PDF uniquement · 10 Mo max</div>
+      </div>
+      <p class="upload-status" id="deliverableUploadStatus"></p>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <select id="filterDeliverableClient" class="filter-select"><option value="">Tous les clients</option></select>
+    <select id="filterDeliverableType" class="filter-select"><option value="">Tous les types</option></select>
+  </div>
+
+  <div class="card">
+    <div id="deliverablesContent"><p class="loading">Chargement des livrables...</p></div>
+  </div>
 </main>
 
 <div class="modal-overlay" id="confirmOverlay">
@@ -534,6 +642,18 @@ const DOC_TYPES = [
 
 function docTypeLabel(value) {
   const found = DOC_TYPES.find(d => d.value === value);
+  return found ? found.label : value;
+}
+
+const DELIVERABLE_TYPES = [
+  { value: "bilan", label: "Bilan" },
+  { value: "liasse_fiscale", label: "Liasse fiscale" },
+  { value: "rapport", label: "Rapport" },
+  { value: "autre", label: "Autre document" },
+];
+
+function deliverableTypeLabel(value) {
+  const found = DELIVERABLE_TYPES.find(d => d.value === value);
   return found ? found.label : value;
 }
 
@@ -811,6 +931,8 @@ async function loadClients() {
 
     document.getElementById("filterClient").innerHTML = '<option value="">Tous les clients</option>' + options;
     document.getElementById("requestClientSelect").innerHTML = options;
+    document.getElementById("deliverableClientSelect").innerHTML = options;
+    document.getElementById("filterDeliverableClient").innerHTML = '<option value="">Tous les clients</option>' + options;
   } catch (err) {
     console.error("Erreur chargement clients:", err.message);
   }
@@ -820,6 +942,12 @@ function populateDocTypeFilters() {
   const filterOptions = DOC_TYPES.map(d => `<option value="${d.value}">${escapeHtml(d.label)}</option>`).join("");
   document.getElementById("filterDocType").innerHTML = '<option value="">Tous les types</option>' + filterOptions;
   document.getElementById("requestDocTypeSelect").innerHTML = filterOptions;
+}
+
+function populateDeliverableTypeSelects() {
+  const options = DELIVERABLE_TYPES.map(d => `<option value="${d.value}">${escapeHtml(d.label)}</option>`).join("");
+  document.getElementById("deliverableTypeSelect").innerHTML = options;
+  document.getElementById("filterDeliverableType").innerHTML = '<option value="">Tous les types</option>' + options;
 }
 
 /* ---------- Invoices / documents ---------- */
@@ -925,13 +1053,201 @@ function confirmDeleteInvoice(id, btn) {
   });
 }
 
+/* ---------- Deliverables (accountant -> client) ---------- */
+function setDeliverableUploadStatus(text, kind) {
+  const status = document.getElementById("deliverableUploadStatus");
+  status.textContent = text;
+  status.className = "upload-status" + (kind ? " " + kind : "");
+}
+
+async function uploadDeliverable(file) {
+  const clientId = document.getElementById("deliverableClientSelect").value;
+  const docType = document.getElementById("deliverableTypeSelect").value;
+  const note = document.getElementById("deliverableNote").value.trim();
+
+  if (!clientId) {
+    setDeliverableUploadStatus("Sélectionnez un client avant d'envoyer.", "error");
+    return;
+  }
+  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+    setDeliverableUploadStatus("Seuls les fichiers PDF sont acceptés.", "error");
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    setDeliverableUploadStatus("Le fichier dépasse la taille maximale (10 Mo).", "error");
+    return;
+  }
+
+  setDeliverableUploadStatus(`Envoi de "${file.name}"...`, "uploading");
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("client_id", clientId);
+  formData.append("doc_type", docType);
+  if (note) formData.append("note", note);
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/deliverables`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` },
+      body: formData
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Échec de l'envoi du document.");
+
+    setDeliverableUploadStatus("Document envoyé au client.", "success");
+    document.getElementById("deliverableNote").value = "";
+    loadDeliverables();
+    setTimeout(() => setDeliverableUploadStatus(""), 3000);
+  } catch (err) {
+    setDeliverableUploadStatus(`Erreur : ${err.message}`, "error");
+  }
+}
+
+async function loadDeliverables() {
+  const content = document.getElementById("deliverablesContent");
+  const countChip = document.getElementById("deliverableCountChip");
+
+  const clientId = document.getElementById("filterDeliverableClient").value;
+  const docType = document.getElementById("filterDeliverableType").value;
+  const params = new URLSearchParams();
+  if (clientId) params.set("client_id", clientId);
+  if (docType) params.set("doc_type", docType);
+  const qs = params.toString();
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/deliverables${qs ? "?" + qs : ""}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const items = await res.json();
+    if (!res.ok) throw new Error(items.detail);
+
+    countChip.textContent = items.length === 0
+      ? "0 livrable"
+      : `${items.length} livrable${items.length > 1 ? "s" : ""}`;
+
+    if (items.length === 0) {
+      content.innerHTML = '<p class="empty">Aucun document envoyé pour le moment.</p>';
+      return;
+    }
+
+    let html = `<table>
+      <thead><tr>
+        <th>N°</th><th>Client</th><th>Entreprise</th><th>Type</th><th>Fichier</th><th>Envoyé le</th><th></th>
+      </tr></thead><tbody>`;
+
+    items.forEach((d, i) => {
+      const ref = String(i + 1).padStart(3, "0");
+      html += `<tr>
+        <td class="row-num">${ref}</td>
+        <td class="cell-name">${escapeHtml(d.client_name) || "-"}</td>
+        <td>${escapeHtml(d.company_name) || "-"}</td>
+        <td><span class="doctype-badge">${escapeHtml(deliverableTypeLabel(d.doc_type))}</span></td>
+        <td class="cell-subject">${escapeHtml(d.filename)}${d.note ? `<div class="note-sub">${escapeHtml(d.note)}</div>` : ""}</td>
+        <td class="cell-date">${formatDate(d.uploaded_at)}</td>
+        <td>
+          <div class="invoice-actions">
+            <button class="btn-download" onclick="downloadDeliverable(${d.id}, this)">Télécharger</button>
+            <button class="delete-msg" onclick="confirmDeleteDeliverable(${d.id}, this)">Supprimer</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function downloadDeliverable(id, btn) {
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/admin/deliverables/${id}/download`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Téléchargement impossible.");
+    const blob = await res.blob();
+    const cd = res.headers.get("Content-Disposition") || "";
+    const match = cd.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : "document.pdf";
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function confirmDeleteDeliverable(id, btn) {
+  const row = btn.closest("tr");
+  const filename = row.querySelector(".cell-subject")?.textContent || "ce document";
+  openConfirm({
+    title: "Supprimer le document",
+    text: `Voulez-vous vraiment supprimer <strong>${escapeHtml(filename)}</strong> ? Le client n'y aura plus accès.`,
+    onConfirm: async () => {
+      row.querySelectorAll("button").forEach(b => b.disabled = true);
+      try {
+        await fetch(`${API_BASE}/admin/deliverables/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } finally {
+        loadDeliverables();
+      }
+    }
+  });
+}
+
+const deliverableUploadZone = document.getElementById("deliverableUploadZone");
+const deliverableFileInput = document.getElementById("deliverableFileInput");
+
+deliverableUploadZone.addEventListener("click", (e) => {
+  if (e.target === deliverableFileInput) return;
+  deliverableFileInput.click();
+});
+deliverableFileInput.addEventListener("change", () => {
+  if (deliverableFileInput.files[0]) uploadDeliverable(deliverableFileInput.files[0]);
+  deliverableFileInput.value = "";
+});
+["dragenter", "dragover"].forEach(evt =>
+  deliverableUploadZone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    deliverableUploadZone.classList.add("dragover");
+  })
+);
+["dragleave", "drop"].forEach(evt =>
+  deliverableUploadZone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    deliverableUploadZone.classList.remove("dragover");
+  })
+);
+deliverableUploadZone.addEventListener("drop", (e) => {
+  const file = e.dataTransfer.files[0];
+  if (file) uploadDeliverable(file);
+});
+
+document.getElementById("filterDeliverableClient").addEventListener("change", loadDeliverables);
+document.getElementById("filterDeliverableType").addEventListener("change", loadDeliverables);
+
 document.getElementById("filterClient").addEventListener("change", loadInvoices);
 document.getElementById("filterDocType").addEventListener("change", loadInvoices);
 
 populateDocTypeFilters();
+populateDeliverableTypeSelects();
 loadPending();
 loadMessages();
-loadClients().then(loadInvoices);
+loadClients().then(() => {
+  loadInvoices();
+  loadDeliverables();
+});
 </script>
 </body>
 </html>

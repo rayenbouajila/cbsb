@@ -387,7 +387,12 @@ function validateSignupForm() {
   } else {
     setFieldError("companyName", "");
   }
-
+  if(!matriculeFiscal) {
+    setFieldError("matricule_fiscal", "Le matricule fiscal est requis.");
+    valid = false;
+  } else {
+    setFieldError("matricule_fiscal", "");
+  }
   if (!email) {
     setFieldError("email", "L'email est requis.");
     valid = false;

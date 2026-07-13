@@ -108,25 +108,6 @@
 
   .section-gap{ height:40px; }
 
-  .dossier-card{
-    background:#fff;
-    border-radius:6px;
-    border: 1px solid rgba(26,49,44,.08);
-    border-left: 4px solid var(--teal);
-    box-shadow: 0 1px 3px rgba(26,49,44,.05);
-    padding: 8px 0;
-  }
-
-  .row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding: 18px 28px;
-    border-bottom: 1px solid rgba(26,49,44,.07);
-    gap: 16px;
-  }
-  .row:last-child{ border-bottom:none; }
-
   .row-label{
     font-family: var(--font-mono);
     font-size:11px;
@@ -135,25 +116,6 @@
     color: #8A9A93;
     flex-shrink:0;
   }
-  .row-value{
-    font-size: 15.5px;
-    color: var(--forest);
-    font-weight:600;
-    text-align:right;
-  }
-
-  .pill{
-    font-family: var(--font-mono);
-    font-size:11px;
-    letter-spacing:.06em;
-    text-transform:uppercase;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-weight:600;
-  }
-  .pill.pending{ background: rgba(66,132,117,.12); color: var(--teal); border:1px solid rgba(66,132,117,.3); }
-  .pill.active{ background: rgba(137,215,183,.28); color:#1A312C; border:1px solid rgba(66,132,117,.35); }
-  .pill.rejected{ background: rgba(166,67,45,.1); color: var(--ink-red); border:1px solid rgba(166,67,45,.3); }
 
   .loading, .error-state{
     padding: 40px 20px;
@@ -188,6 +150,14 @@
     padding: 15px 20px;
     border-top: 1px solid rgba(26,49,44,.07);
     gap: 14px;
+    transition: opacity .25s ease, max-height .25s ease, padding .25s ease;
+  }
+  .request-row.fulfilled{
+    opacity:0;
+    max-height:0;
+    padding-top:0;
+    padding-bottom:0;
+    overflow:hidden;
   }
   .request-row:first-child{ border-top:none; }
   .request-info{ display:flex; flex-direction:column; gap:3px; min-width:0; }
@@ -320,6 +290,11 @@
     font-family: var(--font-mono);
     font-size:11px;
     color:#8A9A93;
+  }
+  .deliverable-note{
+    font-size:12.5px;
+    color:#5A6E67;
+    margin-top:3px;
   }
 
   .invoice-actions{ display:flex; gap:6px; flex-shrink:0; }
@@ -457,12 +432,7 @@
 </header>
 
 <main class="page">
-  <span class="eyebrow">Mon dossier</span>
-  <h2>Bienvenue</h2>
-
-  <div class="dossier-card" id="cardWrap">
-    <div id="info"><p class="loading">Chargement de votre profil...</p></div>
-  </div>
+  <h2 id="welcomeHeading">Bienvenue</h2>
 
   <div id="requestsWrap" style="display:none;">
     <div class="section-gap"></div>
@@ -470,6 +440,13 @@
     <div class="requests-card">
       <div id="requestsList"></div>
     </div>
+  </div>
+
+  <div class="section-gap"></div>
+
+  <h3 class="section-title">Documents du cabinet</h3>
+  <div class="invoices-card">
+    <div class="invoices-list" id="deliverablesList"><p class="invoices-empty">Chargement...</p></div>
   </div>
 
   <div class="section-gap"></div>
@@ -524,6 +501,18 @@ function docTypeLabel(value) {
   return found ? found.label : value;
 }
 
+const DELIVERABLE_TYPES = [
+  { value: "bilan", label: "Bilan" },
+  { value: "liasse_fiscale", label: "Liasse fiscale" },
+  { value: "rapport", label: "Rapport" },
+  { value: "autre", label: "Autre document" },
+];
+
+function deliverableTypeLabel(value) {
+  const found = DELIVERABLE_TYPES.find(d => d.value === value);
+  return found ? found.label : value;
+}
+
 if (!token) {
   window.location.href = "/login";
 }
@@ -572,19 +561,8 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* ---------- Profile ---------- */
-function statusPill(status) {
-  const s = (status || "").toLowerCase();
-  if (s.includes("approuv") || s.includes("active") || s.includes("valid")) {
-    return { cls: "active", label: "Compte validé" };
-  }
-  if (s.includes("reject") || s.includes("refus")) {
-    return { cls: "rejected", label: "Demande rejetée" };
-  }
-  return { cls: "pending", label: status ? status : "En attente" };
-}
-
 async function loadProfile() {
-  const info = document.getElementById("info");
+  const heading = document.getElementById("welcomeHeading");
   try {
     const res = await fetch(`${API_BASE}/auth/me`, {
       headers: { "Authorization": `Bearer ${token}` }
@@ -592,28 +570,9 @@ async function loadProfile() {
     const user = await res.json();
     if (!res.ok) throw new Error(user.detail);
 
-    const pill = statusPill(user.status);
-
-    info.innerHTML = `
-      <div class="row">
-        <span class="row-label">Nom</span>
-        <span class="row-value">${escapeHtml(user.full_name) || "-"}</span>
-      </div>
-      <div class="row">
-        <span class="row-label">Entreprise</span>
-        <span class="row-value">${escapeHtml(user.company_name) || "-"}</span>
-      </div>
-      <div class="row">
-        <span class="row-label">Email</span>
-        <span class="row-value">${escapeHtml(user.email)}</span>
-      </div>
-      <div class="row">
-        <span class="row-label">Statut</span>
-        <span class="pill ${pill.cls}">${escapeHtml(pill.label)}</span>
-      </div>
-    `;
+    heading.textContent = user.full_name ? `Bienvenue, ${user.full_name}` : "Bienvenue";
   } catch (err) {
-    info.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+    heading.textContent = "Bienvenue";
   }
 }
 
@@ -647,6 +606,70 @@ async function loadDocumentRequests() {
   } catch (err) {
     wrap.style.display = "block";
     list.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+/* ---------- Deliverables from the accountant (bilans, liasses fiscales...) ---------- */
+async function loadDeliverables() {
+  const wrap = document.getElementById("deliverablesList");
+  try {
+    const res = await fetch(`${API_BASE}/client/deliverables`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const items = await res.json();
+    if (!res.ok) throw new Error(items.detail);
+
+    if (items.length === 0) {
+      wrap.innerHTML = '<p class="invoices-empty">Aucun document reçu du cabinet pour le moment.</p>';
+      return;
+    }
+
+    wrap.innerHTML = items.map(d => `
+      <div class="invoice-row" data-id="${d.id}">
+        <div class="invoice-info">
+          <span class="invoice-icon">${pdfIconSvg}</span>
+          <div>
+            <div class="invoice-name">${escapeHtml(d.filename)}</div>
+            <div class="invoice-meta">
+              <span class="doctype-pill">${escapeHtml(deliverableTypeLabel(d.doc_type))}</span>
+              <span class="invoice-date">${formatDate(d.uploaded_at)}</span>
+            </div>
+            ${d.note ? `<div class="deliverable-note">${escapeHtml(d.note)}</div>` : ""}
+          </div>
+        </div>
+        <div class="invoice-actions">
+          <button class="btn-download" onclick="downloadDeliverable(${d.id}, this)">Télécharger</button>
+        </div>
+      </div>
+    `).join("");
+  } catch (err) {
+    wrap.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function downloadDeliverable(id, btn) {
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/client/deliverables/${id}/download`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Téléchargement impossible.");
+    const blob = await res.blob();
+    const cd = res.headers.get("Content-Disposition") || "";
+    const match = cd.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : "document.pdf";
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false;
   }
 }
 
@@ -733,6 +756,11 @@ async function uploadInvoice(file) {
     if (!res.ok) throw new Error(data.detail || "Échec de l'envoi du document.");
 
     setUploadStatus("Document envoyé avec succès.", "success");
+
+    if (requestId) {
+      removeRequestRow(requestId);
+    }
+
     uploadContext = null;
     loadInvoices();
     loadDocumentRequests();
@@ -745,6 +773,19 @@ async function uploadInvoice(file) {
 function triggerUploadForRequest(requestId, docType) {
   uploadContext = { requestId, docType };
   document.getElementById("fileInput").click();
+}
+
+function removeRequestRow(requestId) {
+  const row = document.querySelector(`.request-row[data-id="${requestId}"]`);
+  if (!row) return;
+  row.classList.add("fulfilled");
+  setTimeout(() => {
+    row.remove();
+    const list = document.getElementById("requestsList");
+    if (list && list.children.length === 0) {
+      document.getElementById("requestsWrap").style.display = "none";
+    }
+  }, 260);
 }
 
 async function downloadInvoice(id, btn) {
@@ -796,7 +837,8 @@ function confirmDeleteInvoice(id, btn) {
 const uploadZone = document.getElementById("uploadZone");
 const fileInput = document.getElementById("fileInput");
 
-uploadZone.addEventListener("click", () => {
+uploadZone.addEventListener("click", (e) => {
+  if (e.target === fileInput) return; // ignore the click bubbling up from the input itself
   uploadContext = null;
   fileInput.click();
 });
@@ -826,6 +868,7 @@ uploadZone.addEventListener("drop", (e) => {
 populateDocTypeSelect();
 loadProfile();
 loadDocumentRequests();
+loadDeliverables();
 loadInvoices();
 </script>
 </body>

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr,Field
-from .models import RoleEnum, StatusEnum, DocumentTypeEnum, RequestStatusEnum
+from .models import RoleEnum, StatusEnum, DocumentTypeEnum, RequestStatusEnum,DeliverableTypeEnum
 
 
 class RegisterRequest(BaseModel):
@@ -100,6 +100,30 @@ class DocumentRequestOut(BaseModel):
     note: Optional[str] = None
     status: RequestStatusEnum
     created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class DeliverableOut(BaseModel):
+    id: int
+    filename: str
+    doc_type: DeliverableTypeEnum
+    note: Optional[str] = None
+    uploaded_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class DeliverableAdminOut(BaseModel):
+    id: int
+    filename: str
+    doc_type: DeliverableTypeEnum
+    note: Optional[str] = None
+    uploaded_at: datetime
+    client_name: Optional[str] = None
+    company_name: Optional[str] = None
 
     class Config:
         from_attributes = True

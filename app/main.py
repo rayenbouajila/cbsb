@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from . import models, auth_utils
 from .database import engine, SessionLocal
 from .routers import auth_router, admin_router,contact
-from .routers import invoices_router
+from .routers import invoices_router,deliverables_router
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -18,6 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(deliverables_router.router)
 app.include_router(auth_router.router)
 app.include_router(admin_router.router)
 app.include_router(contact.router)
