@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demande de compte - CBSB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1A312C;
+    --forest-deep:#122420;
+    --teal:#428475;
+    --mint:#89D7B7;
+    --cream:#FFF4E1;
+    --cream-dim:#EFE3C9;
+    --ink-red:#A6432E;
+    --text-on-cream:#213A34;
+    --font-display:'Fraunces', serif;
+    --font-body:'Public Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{
+    font-family: var(--font-body);
+    color: var(--text-on-cream);
+    background: var(--cream);
+  }
+
+  .shell{
+    min-height:100vh;
+    display:grid;
+    grid-template-columns: 0.86fr 1fr;
+  }
+
+  /* ---------- Brand panel ---------- */
+  .brand-panel{
+    position:relative;
+    background:
+      radial-gradient(ellipse 60% 45% at 25% 12%, rgba(137,215,183,.16), transparent 60%),
+      repeating-linear-gradient(to bottom, transparent 0 39px, rgba(255,244,225,.05) 39px 40px),
+      linear-gradient(to right, transparent 0 78px, rgba(137,215,183,.14) 78px 79px, transparent 79px 100%),
+      linear-gradient(160deg, var(--forest) 0%, var(--forest-deep) 100%);
+    color: var(--cream);
+    padding: 56px 52px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+  }
+
+  .brand-mark{ display:flex; flex-direction:column; gap:18px; }
+
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color: var(--mint);
+    opacity:.85;
+  }
+
+  .wordmark{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size: clamp(40px, 6vw, 58px);
+    letter-spacing:-.01em;
+    line-height:1;
+    margin:0;
+  }
+
+  .tagline{
+    font-family: var(--font-display);
+    font-style:italic;
+    font-weight:500;
+    font-size:17px;
+    color: var(--cream-dim);
+    max-width: 30ch;
+    line-height:1.5;
+    margin:0;
+  }
+
+  /* Status stepper - mirrors the real account lifecycle */
+  .stepper{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    margin-top:40px;
+  }
+  .step{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    position:relative;
+    padding-bottom:26px;
+  }
+  .step:last-child{ padding-bottom:0; }
+  .step::before{
+    content:"";
+    position:absolute;
+    left:11px; top:24px; bottom:0;
+    width:1px;
+    background: rgba(137,215,183,.3);
+  }
+  .step:last-child::before{ display:none; }
+  .step-num{
+    flex-shrink:0;
+    width:23px; height:23px;
+    border-radius:50%;
+    border:1.2px solid var(--mint);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    color: var(--mint);
+    background: rgba(137,215,183,.08);
+    transition: background .2s ease, color .2s ease;
+  }
+  .step.active .step-num{ background: var(--mint); color: var(--forest-deep); font-weight:600; }
+  .step.done .step-num{ background: var(--teal); border-color: var(--teal); color: var(--cream); }
+  .step-text b{
+    display:block;
+    font-size:13.5px;
+    font-weight:600;
+    color: var(--cream);
+  }
+  .step-text span{
+    font-size:12px;
+    color: var(--cream-dim);
+    opacity:.75;
+  }
+
+  .dossier{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    color: var(--cream-dim);
+    opacity:.55;
+  }
+
+  /* ---------- Form panel ---------- */
+  .form-panel{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 40px;
+  }
+
+  .box{
+    width:100%;
+    max-width:420px;
+  }
+
+  .box h2{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:30px;
+    margin:0 0 6px;
+    color: var(--forest);
+  }
+  .box .subhead{
+    font-size:14.5px;
+    color:#5A6E67;
+    margin:0 0 28px;
+  }
+
+  .grid-2{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+  }
+
+  .field{ margin-bottom: 18px; }
+
+  label.field-label{
+    display:block;
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color: var(--teal);
+    margin-bottom:8px;
+  }
+
+  input{
+    width:100%;
+    padding: 10px 2px;
+    font-family: var(--font-body);
+    font-size:15px;
+    color: var(--text-on-cream);
+    background: transparent;
+    border:none;
+    border-bottom: 1.5px solid rgba(26,49,44,.22);
+    border-radius:0;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  input::placeholder{ color:#9BA9A3; }
+  input:focus{
+    outline:none;
+    border-bottom-color: var(--teal);
+    box-shadow: 0 1px 0 0 var(--mint);
+  }
+  input.invalid{ border-bottom-color: var(--ink-red); }
+  input.invalid:focus{ box-shadow: 0 1px 0 0 var(--ink-red); }
+
+  .field-error{
+    font-family: var(--font-mono);
+    color: var(--ink-red);
+    font-size:11px;
+    min-height:15px;
+    margin-top:6px;
+  }
+
+  .msg{
+    font-family: var(--font-mono);
+    font-size:12.5px;
+    min-height:16px;
+    margin-bottom:14px;
+    padding: 0;
+  }
+  .msg.error{ color: var(--ink-red); }
+  .msg.success{
+    color: var(--forest);
+    background: rgba(137,215,183,.28);
+    border-left: 3px solid var(--teal);
+    padding: 10px 12px;
+    border-radius: 2px;
+    line-height:1.5;
+  }
+
+  button{
+    width:100%;
+    padding:13px;
+    margin-top:6px;
+    background: var(--forest);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:14.5px;
+    letter-spacing:.02em;
+    border:none;
+    border-radius:3px;
+    cursor:pointer;
+    transition: background .18s ease, transform .06s ease, box-shadow .18s ease;
+  }
+  button:hover{ background: var(--teal); box-shadow: 0 4px 14px rgba(66,132,117,.35); }
+  button:active{ transform: scale(.98); }
+  button:disabled{ background:#9BAFA9; cursor:not-allowed; box-shadow:none; }
+
+  a.switch-link{
+    display:block;
+    text-align:center;
+    margin-top:20px;
+    font-size:13.5px;
+    color: var(--teal);
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+  }
+  a.switch-link:hover{ border-bottom-color: var(--teal); }
+
+  :focus-visible{
+    outline: 2px solid var(--mint);
+    outline-offset: 3px;
+  }
+
+  /* ---------- Verification (OTP) step ---------- */
+  #verifySection{ display:none; }
+
+  .verify-icon{
+    width:48px; height:48px;
+    border-radius:50%;
+    background: rgba(66,132,117,.1);
+    color: var(--teal);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:18px;
+  }
+
+  .verify-target{
+    font-family: var(--font-mono);
+    font-size:13px;
+    color: var(--text-on-cream);
+    background: rgba(255,244,225,.6);
+    border: 1px solid rgba(26,49,44,.08);
+    border-radius: 4px;
+    padding: 9px 12px;
+    margin: 0 0 26px;
+    word-break: break-all;
+  }
+
+  .otp-row{
+    display:flex;
+    gap:9px;
+    margin-bottom: 6px;
+  }
+  .otp-digit{
+    width:100%;
+    aspect-ratio: 1 / 1;
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size:22px;
+    font-weight:600;
+    color: var(--forest);
+    background: transparent;
+    border: 1.5px solid rgba(26,49,44,.22);
+    border-radius:6px;
+    padding:0;
+  }
+  .otp-digit:focus{
+    outline:none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(137,215,183,.28);
+  }
+  .otp-digit.invalid{ border-color: var(--ink-red); }
+
+  .otp-hint{
+    font-family: var(--font-mono);
+    font-size:11px;
+    color:#8A9A93;
+    margin: 0 0 22px;
+  }
+
+  .resend-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    margin-top:18px;
+    font-size:13px;
+    color:#5A6E67;
+  }
+  .resend-btn{
+    width:auto;
+    padding:0;
+    margin:0;
+    background:none;
+    color: var(--teal);
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:13px;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .resend-btn:hover{ background:none; box-shadow:none; color: var(--forest); }
+  .resend-btn:disabled{ background:none; color:#9BA9A3; cursor:not-allowed; text-decoration:none; }
+
+  .back-link{
+    display:block;
+    text-align:center;
+    margin-top:16px;
+    font-size:12.5px;
+    color:#8A9A93;
+    text-decoration:none;
+    cursor:pointer;
+    border-bottom:1px solid transparent;
+  }
+  .back-link:hover{ color: var(--teal); border-bottom-color: var(--teal); }
+
+  .verified-panel{ display:none; text-align:center; }
+  .verified-icon{
+    width:56px; height:56px;
+    border-radius:50%;
+    background: rgba(137,215,183,.28);
+    color: var(--forest);
+    display:flex; align-items:center; justify-content:center;
+    margin: 0 auto 18px;
+  }
+  .verified-panel h2{ text-align:center; }
+  .verified-panel .subhead{ text-align:center; }
+
+  @media (max-width: 860px){
+    .shell{ grid-template-columns: 1fr; }
+    .brand-panel{ padding:36px 28px; }
+    .stepper{ margin-top:26px; }
+    .form-panel{ padding: 36px 24px 56px; }
+    .grid-2{ grid-template-columns: 1fr; }
+    .otp-digit{ font-size:19px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="brand-panel">
+    <div class="brand-mark">
+      <span class="eyebrow">Cabinet d'expertise comptable</span>
+      <h1 class="wordmark">CBSB</h1>
+      <p class="tagline">Cabinet Ben Said Belgacem - la rigueur des chiffres, la clarté du conseil.</p>
+    </div>
+
+    <div class="stepper" id="stepper">
+      <div class="step active" id="step-1">
+        <span class="step-num">01</span>
+        <span class="step-text"><b>Demande</b><span>Vous renseignez vos informations</span></span>
+      </div>
+      <div class="step" id="step-2">
+        <span class="step-num">02</span>
+        <span class="step-text"><b>Vérification email</b><span>Vous saisissez le code reçu par email</span></span>
+      </div>
+      <div class="step" id="step-3">
+        <span class="step-num">03</span>
+        <span class="step-text"><b>Examen du dossier</b><span>Notre équipe examine votre demande</span></span>
+      </div>
+      <div class="step" id="step-4">
+        <span class="step-num">04</span>
+        <span class="step-text"><b>Accès validé</b><span>Vous recevez un email et pouvez vous connecter</span></span>
+      </div>
+    </div>
+
+    <span class="dossier">Réf. plateforme - Kébili, Tunisie</span>
+  </aside>
+
+  <main class="form-panel">
+    <div class="box">
+
+      <!-- ---------- Étape 1 : formulaire de demande ---------- -->
+      <div id="signupSection">
+        <h2>Demande de compte</h2>
+        <p class="subhead">Votre compte sera activé après validation par le cabinet.</p>
+        <div class="msg" id="msg"></div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label class="field-label" for="fullName">Nom complet</label>
+            <input type="text" id="fullName" placeholder="Prénom Nom" required />
+            <div class="field-error" id="fullName-error"></div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="companyName">Entreprise</label>
+            <input type="text" id="companyName" placeholder="Nom de l'entreprise" required />
+            <div class="field-error" id="companyName-error"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="matricule_fiscal">Matricule fiscal</label>
+          <input type="text" id="matricule_fiscal" placeholder="1234567X" required />
+          <div class="field-error" id="matricule_fiscal-error"></div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="email">Email</label>
+          <input type="email" id="email" placeholder="nom@exemple.com" required />
+          <div class="field-error" id="email-error"></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label class="field-label" for="password">Mot de passe</label>
+            <input type="password" id="password" placeholder="••••••••" required />
+            <div class="field-error" id="password-error"></div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="confirmPassword">Confirmer</label>
+            <input type="password" id="confirmPassword" placeholder="••••••••" required />
+            <div class="field-error" id="confirmPassword-error"></div>
+          </div>
+        </div>
+
+        <button id="submitBtn" onclick="signup()">Envoyer la demande</button>
+        <a class="switch-link" href="/login">Déjà un compte ? Se connecter</a>
+      </div>
+
+      <!-- ---------- Étape 2 : saisie du code OTP ---------- -->
+      <div id="verifySection">
+        <div class="verify-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        </div>
+        <h2>Vérifiez votre email</h2>
+        <p class="subhead">Un code à 6 chiffres a été envoyé à l'adresse suivante. Il expire dans 10 minutes.</p>
+        <p class="verify-target" id="verifyTargetEmail"></p>
+
+        <div class="msg" id="verifyMsg"></div>
+
+        <div class="otp-row" id="otpRow">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="0" autocomplete="one-time-code">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="1">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="2">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="3">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="4">
+          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="5">
+        </div>
+        <p class="otp-hint">Vous pouvez coller le code entier, il se répartira automatiquement.</p>
+
+        <button id="verifyBtn" onclick="verifyEmail()">Vérifier le code</button>
+
+        <div class="resend-row">
+          <span>Vous n'avez rien reçu ?</span>
+          <button class="resend-btn" id="resendBtn" onclick="resendCode()">Renvoyer le code</button>
+        </div>
+
+        <a class="back-link" onclick="backToSignup()">← Revenir au formulaire</a>
+      </div>
+
+      <!-- ---------- Étape 3 : confirmation finale ---------- -->
+      <div id="verifiedPanel" class="verified-panel">
+        <div class="verified-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <h2>Email vérifié</h2>
+        <p class="subhead">Votre demande est maintenant en attente de validation par le cabinet. Vous recevrez un email dès que votre accès sera activé.</p>
+        <a class="switch-link" href="/login">Retour à la page de connexion</a>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+const RESEND_COOLDOWN_SECONDS = 60;
+
+let registeredEmail = "";
+let resendTimer = null;
+
+function setFieldError(id, message) {
+  const input = document.getElementById(id);
+  const errBox = document.getElementById(id + "-error");
+  input.classList.toggle("invalid", !!message);
+  errBox.textContent = message || "";
+}
+
+function validateSignupForm() {
+  let valid = true;
+
+  const fullName = document.getElementById("fullName").value.trim();
+  const matriculeFiscal = document.getElementById("matricule_fiscal").value.trim();
+  const companyName = document.getElementById("companyName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+
+  if (!fullName) {
+    setFieldError("fullName", "Requis.");
+    valid = false;
+  } else if (fullName.length < 3) {
+    setFieldError("fullName", "3 caractères min.");
+    valid = false;
+  } else {
+    setFieldError("fullName", "");
+  }
+
+  if (!companyName) {
+    setFieldError("companyName", "Requis.");
+    valid = false;
+  } else {
+    setFieldError("companyName", "");
+  }
+  if(!matriculeFiscal) {
+    setFieldError("matricule_fiscal", "Le matricule fiscal est requis.");
+    valid = false;
+  } else {
+    setFieldError("matricule_fiscal", "");
+  }
+  if (!email) {
+    setFieldError("email", "L'email est requis.");
+    valid = false;
+  } else if (!EMAIL_REGEX.test(email)) {
+    setFieldError("email", "Format d'email invalide.");
+    valid = false;
+  } else {
+    setFieldError("email", "");
+  }
+
+  if (!password) {
+    setFieldError("password", "Requis.");
+    valid = false;
+  } else if (!PASSWORD_REGEX.test(password)) {
+    setFieldError("password", "8 car. min., 1 lettre, 1 chiffre.");
+    valid = false;
+  } else {
+    setFieldError("password", "");
+  }
+
+  if (!confirmPassword) {
+    setFieldError("confirmPassword", "Requis.");
+    valid = false;
+  } else if (confirmPassword !== password) {
+    setFieldError("confirmPassword", "Ne correspond pas.");
+    valid = false;
+  } else {
+    setFieldError("confirmPassword", "");
+  }
+
+  return valid;
+}
+
+["fullName","matricule_fiscal", "companyName", "email", "password", "confirmPassword"].forEach(id => {
+  document.getElementById(id).addEventListener("blur", validateSignupForm);
+});
+
+async function signup() {
+  const msgBox = document.getElementById("msg");
+  msgBox.className = "msg";
+  msgBox.textContent = "";
+
+  if (!validateSignupForm()) return;
+
+  const full_name = document.getElementById("fullName").value.trim();
+  const matricule_fiscal = document.getElementById("matricule_fiscal").value.trim();
+  const company_name = document.getElementById("companyName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const btn = document.getElementById("submitBtn");
+
+  btn.disabled = true;
+  btn.textContent = "Envoi en cours...";
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, matricule_fiscal, full_name, company_name, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Échec de l'inscription.");
+
+    registeredEmail = email;
+    showVerifyStep();
+  } catch (err) {
+    msgBox.className = "msg error";
+    msgBox.textContent = err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Envoyer la demande";
+  }
+}
+
+/* ---------- Étape 2 : vérification OTP ---------- */
+
+function showVerifyStep() {
+  document.getElementById("signupSection").style.display = "none";
+  document.getElementById("verifySection").style.display = "block";
+  document.getElementById("verifyTargetEmail").textContent = registeredEmail;
+
+  document.getElementById("step-1").classList.replace("active", "done");
+  document.getElementById("step-2").classList.add("active");
+
+  clearOtpInputs();
+  startResendCooldown();
+  document.querySelector('.otp-digit[data-idx="0"]').focus();
+}
+
+function backToSignup() {
+  document.getElementById("verifySection").style.display = "none";
+  document.getElementById("signupSection").style.display = "block";
+  document.getElementById("step-2").classList.remove("active");
+  document.getElementById("step-1").classList.replace("done", "active");
+  if (resendTimer) clearInterval(resendTimer);
+}
+
+function clearOtpInputs() {
+  document.querySelectorAll(".otp-digit").forEach(input => {
+    input.value = "";
+    input.classList.remove("invalid");
+  });
+}
+
+function getOtpCode() {
+  const digits = Array.from(document.querySelectorAll(".otp-digit")).map(i => i.value);
+  return digits.join("");
+}
+
+function setOtpInvalid(isInvalid) {
+  document.querySelectorAll(".otp-digit").forEach(input => input.classList.toggle("invalid", isInvalid));
+}
+
+// Auto-avance entre les cases + support du collage du code entier
+document.querySelectorAll(".otp-digit").forEach((input, idx, all) => {
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "").slice(0, 1);
+    if (input.value && idx < all.length - 1) {
+      all[idx + 1].focus();
+    }
+    setOtpInvalid(false);
+    if (getOtpCode().length === 6) verifyEmail();
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" && !input.value && idx > 0) {
+      all[idx - 1].focus();
+    }
+  });
+
+  input.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const pasted = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!pasted) return;
+    pasted.split("").forEach((digit, i) => {
+      if (all[i]) all[i].value = digit;
+    });
+    const lastFilled = Math.min(pasted.length, all.length) - 1;
+    if (lastFilled >= 0) all[lastFilled].focus();
+    setOtpInvalid(false);
+    if (getOtpCode().length === 6) verifyEmail();
+  });
+});
+
+async function verifyEmail() {
+  const msgBox = document.getElementById("verifyMsg");
+  msgBox.className = "msg";
+  msgBox.textContent = "";
+
+  const code = getOtpCode();
+  if (code.length !== 6) {
+    msgBox.className = "msg error";
+    msgBox.textContent = "Saisissez les 6 chiffres du code.";
+    setOtpInvalid(true);
+    return;
+  }
+
+  const btn = document.getElementById("verifyBtn");
+  btn.disabled = true;
+  btn.textContent = "Vérification...";
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/verify-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: registeredEmail, code })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Code invalide.");
+
+    showVerifiedStep();
+  } catch (err) {
+    msgBox.className = "msg error";
+    msgBox.textContent = err.message;
+    setOtpInvalid(true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Vérifier le code";
+  }
+}
+
+function showVerifiedStep() {
+  if (resendTimer) clearInterval(resendTimer);
+  document.getElementById("verifySection").style.display = "none";
+  document.getElementById("verifiedPanel").style.display = "block";
+
+  document.getElementById("step-2").classList.replace("active", "done");
+  document.getElementById("step-3").classList.add("active");
+}
+
+/* ---------- Renvoi du code ---------- */
+
+function startResendCooldown() {
+  const btn = document.getElementById("resendBtn");
+  let remaining = RESEND_COOLDOWN_SECONDS;
+  btn.disabled = true;
+  btn.textContent = `Renvoyer le code (${remaining}s)`;
+
+  if (resendTimer) clearInterval(resendTimer);
+  resendTimer = setInterval(() => {
+    remaining -= 1;
+    if (remaining <= 0) {
+      clearInterval(resendTimer);
+      btn.disabled = false;
+      btn.textContent = "Renvoyer le code";
+    } else {
+      btn.textContent = `Renvoyer le code (${remaining}s)`;
+    }
+  }, 1000);
+}
+
+async function resendCode() {
+  const msgBox = document.getElementById("verifyMsg");
+  msgBox.className = "msg";
+  msgBox.textContent = "";
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/resend-verification-code`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: registeredEmail })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Échec du renvoi du code.");
+
+    clearOtpInputs();
+    document.querySelector('.otp-digit[data-idx="0"]').focus();
+    msgBox.className = "msg success";
+    msgBox.textContent = "Un nouveau code a été envoyé.";
+    startResendCooldown();
+  } catch (err) {
+    msgBox.className = "msg error";
+    msgBox.textContent = err.message;
+  }
+}
+</script>
+</body>
+</html>

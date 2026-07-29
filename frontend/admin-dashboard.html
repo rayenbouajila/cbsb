@@ -1,0 +1,2607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration - CBSB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1A312C;
+    --forest-deep:#122420;
+    --teal:#428475;
+    --mint:#89D7B7;
+    --cream:#FFF4E1;
+    --cream-dim:#EFE3C9;
+    --ink-red:#A6432E;
+    --text-on-cream:#213A34;
+    --font-display:'Fraunces', serif;
+    --font-body:'Public Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --sidebar-w: 264px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    font-family: var(--font-body);
+    color: var(--text-on-cream);
+    background: var(--cream);
+    min-height:100vh;
+    display:flex;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width: var(--sidebar-w);
+    flex-shrink:0;
+    position:fixed;
+    top:0; left:0; bottom:0;
+    background:
+      radial-gradient(ellipse 70% 60% at 15% 0%, rgba(137,215,183,.12), transparent 60%),
+      linear-gradient(165deg, var(--forest) 0%, var(--forest-deep) 100%);
+    color: var(--cream);
+    display:flex;
+    flex-direction:column;
+    overflow-y:auto;
+    z-index:500;
+    transition: transform .2s ease;
+  }
+
+  .sidebar-brand{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding: 24px 22px 20px;
+    border-bottom: 1px solid rgba(255,244,225,.1);
+    flex-shrink:0;
+  }
+  .mini-seal{ width:34px; height:34px; flex-shrink:0; }
+  .brand-text{ display:flex; flex-direction:column; gap:2px; }
+  .brand-text .name{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:19px;
+    letter-spacing:-.01em;
+  }
+  .brand-text .zone{
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--mint);
+  }
+
+  .sidebar-nav{
+    flex:1;
+    padding: 16px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .nav-section-label{
+    font-family: var(--font-mono);
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: rgba(255,244,225,.4);
+    padding: 10px 14px 6px;
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding: 10.5px 14px;
+    border-radius:6px;
+    color: rgba(255,244,225,.72);
+    background:transparent;
+    border:none;
+    width:100%;
+    text-align:left;
+    font-family: var(--font-body);
+    font-size:13.5px;
+    font-weight:500;
+    cursor:pointer;
+    transition: background .16s ease, color .16s ease;
+  }
+  .nav-item svg{ width:17px; height:17px; flex-shrink:0; opacity:.85; }
+  .nav-item span.label{ flex:1; min-width:0; }
+  .nav-item:hover{ background: rgba(255,244,225,.07); color: var(--cream); }
+  .nav-item.active{ background: rgba(137,215,183,.15); color: var(--mint); }
+  .nav-item.active svg{ opacity:1; }
+  .nav-badge{
+    font-family: var(--font-mono);
+    font-size:10px;
+    font-weight:700;
+    background: rgba(166,67,45,.88);
+    color:#fff;
+    padding: 1.5px 7px;
+    border-radius: 10px;
+    min-width:18px;
+    text-align:center;
+    flex-shrink:0;
+  }
+  .nav-badge.zero{ display:none; }
+
+  .sidebar-footer{
+    padding: 14px 22px 22px;
+    border-top: 1px solid rgba(255,244,225,.1);
+    flex-shrink:0;
+  }
+  a.logout{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    color: var(--cream);
+    text-decoration:none;
+    font-size:13px;
+    font-family: var(--font-body);
+    font-weight:600;
+    padding:9px 14px;
+    border:1px solid rgba(255,244,225,.25);
+    border-radius:5px;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  a.logout:hover{ border-color: var(--mint); background: rgba(137,215,183,.08); }
+
+  /* ---------- Mobile top bar ---------- */
+  .mobile-topbar{ display:none; }
+  .sidebar-overlay{
+    position:fixed; inset:0;
+    background: rgba(18,36,32,.5);
+    z-index:450;
+    display:none;
+  }
+  .sidebar-overlay.show{ display:block; }
+
+  /* ---------- Main content ---------- */
+  .main-content{
+    margin-left: var(--sidebar-w);
+    flex:1;
+    min-width:0;
+  }
+  .content-inner{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 30px 32px 60px;
+  }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; animation: fadein .18s ease; }
+  @keyframes fadein{ from{ opacity:0; transform:translateY(4px);} to{ opacity:1; transform:translateY(0);} }
+
+  .page-head{
+    margin-bottom: 20px;
+  }
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--teal);
+    display:block;
+    margin-bottom:8px;
+  }
+  h2{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size: 27px;
+    color: var(--forest);
+    margin:0;
+  }
+  h3.section-title{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:16.5px;
+    color: var(--forest);
+    margin: 0 0 10px;
+  }
+
+  /* ---------- KPI dashboard grid ---------- */
+  .kpi-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap:14px;
+    margin-bottom: 22px;
+  }
+  .kpi-card{
+    background:#fff;
+    border-radius:8px;
+    border: 1px solid rgba(26,49,44,.08);
+    box-shadow: 0 1px 3px rgba(26,49,44,.05);
+    padding: 18px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .kpi-card .kpi-label{
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color: var(--teal);
+  }
+  .kpi-card .kpi-value{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size: 27px;
+    color: var(--forest);
+    line-height:1.15;
+  }
+  .kpi-card.accent{
+    background: linear-gradient(150deg, var(--forest) 0%, var(--forest-deep) 100%);
+    border-color: transparent;
+  }
+  .kpi-card.accent .kpi-label{ color: var(--mint); }
+  .kpi-card.accent .kpi-value{ color: var(--cream); }
+
+  .section-grid{ display:flex; flex-direction:column; gap:22px; }
+  .grid-2col{ display:grid; grid-template-columns: 1.1fr 1.4fr; gap:20px; align-items:start; }
+  @media (max-width: 980px){ .grid-2col{ grid-template-columns:1fr; } }
+
+  .card{
+    background:#fff;
+    border-radius:6px;
+    border: 1px solid rgba(26,49,44,.08);
+    box-shadow: 0 1px 3px rgba(26,49,44,.05);
+    overflow:hidden;
+  }
+
+  table{ width:100%; border-collapse:collapse; table-layout: fixed; }
+  thead th{
+    text-align:left;
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color: var(--teal);
+    padding: 11px 16px;
+    border-bottom: 1.5px solid rgba(66,132,117,.25);
+    background: rgba(137,215,183,.06);
+  }
+  td{
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(26,49,44,.07);
+    font-size: 14.5px;
+    vertical-align: middle;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr{ transition: background .15s ease; }
+  tbody tr:hover{ background: rgba(255,244,225,.6); }
+
+  .row-num{
+    font-family: var(--font-mono);
+    color: #9BA9A3;
+    font-size:12.5px;
+    width: 56px;
+    white-space: nowrap;
+    padding-left: 12px;
+    padding-right: 6px;
+  }
+  .cell-name{ font-weight:600; color: var(--forest); }
+  .cell-email{ color:#5A6E67; font-family: var(--font-mono); font-size:13px; }
+
+  #content table th:last-child,
+  #content table td:last-child{ width: 190px; }
+
+  .actions{ display:flex; gap:6px; }
+  button{
+    padding: 7px 12px;
+    border-radius: 3px;
+    cursor:pointer;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12.5px;
+    letter-spacing:.02em;
+    white-space: nowrap;
+    transition: background .18s ease, color .18s ease, transform .06s ease, box-shadow .18s ease;
+  }
+  button:active{ transform: scale(.96); }
+
+  .approve{
+    background: var(--teal);
+    color:#fff;
+    border: 1px solid var(--teal);
+  }
+  .approve:hover{ background: var(--forest); box-shadow: 0 3px 10px rgba(26,49,44,.25); }
+
+  .reject{
+    background: transparent;
+    color: var(--ink-red);
+    border: 1px solid rgba(166,67,45,.4);
+  }
+  .reject:hover{ background: var(--ink-red); color:#fff; border-color: var(--ink-red); }
+
+  button:disabled{ opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  .cell-subject{ font-weight:600; color: var(--forest); overflow-wrap: break-word; word-break: break-word; }
+  .msg-preview{ max-width: 320px; overflow-wrap: break-word; word-break: break-word; }
+  .msg-preview summary{
+    cursor:pointer;
+    color:#5A6E67;
+    font-size:14px;
+    list-style:none;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  .msg-preview summary::-webkit-details-marker{ display:none; }
+  .msg-preview summary::after{
+    content:"- voir le message";
+    color: var(--teal);
+    font-family: var(--font-mono);
+    font-size:11.5px;
+    margin-left:6px;
+  }
+  .msg-preview[open] summary::after{ content:"- réduire"; }
+  .msg-preview p{
+    margin: 8px 0 0;
+    font-size:13.8px;
+    color: var(--text-on-cream);
+    line-height:1.6;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .cell-date{ font-family: var(--font-mono); font-size:12px; color:#8A9A93; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* ---------- Invoices ---------- */
+  .filter-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-bottom: 14px;
+  }
+  .filter-select{
+    padding: 8px 12px;
+    border-radius:4px;
+    border: 1px solid rgba(26,49,44,.18);
+    background:#fff;
+    color: var(--text-on-cream);
+    font-family: var(--font-body);
+    font-size:13px;
+    cursor:pointer;
+  }
+  .filter-select:focus-visible{ outline: 2px solid var(--mint); outline-offset:1px; }
+
+  .request-btn{
+    background: var(--teal);
+    color:#fff;
+    border: 1px solid var(--teal);
+    padding: 8px 14px;
+    border-radius:3px;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12.5px;
+    cursor:pointer;
+    margin-left:auto;
+    white-space:nowrap;
+    transition: background .18s ease;
+  }
+  .request-btn:hover{ background: var(--forest); }
+
+  #invoicesContent table th:nth-child(1),
+  #invoicesContent table td:nth-child(1){ width: 34px; }
+  #invoicesContent table th:nth-child(5),
+  #invoicesContent table td:nth-child(5),
+  #deliverablesContent table th:nth-child(4),
+  #deliverablesContent table td:nth-child(4){ width: 130px; }
+  #invoicesContent table th:nth-child(7),
+  #invoicesContent table td:nth-child(7),
+  #deliverablesContent table th:nth-child(6),
+  #deliverablesContent table td:nth-child(6){ width: 125px; }
+  #invoicesContent table th:last-child,
+  #invoicesContent table td:last-child{ width: 235px; }
+  #deliverablesContent table th:last-child,
+  #deliverablesContent table td:last-child{ width: 195px; }
+
+  .row-checkbox{
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    accent-color: var(--teal);
+  }
+  td.select-cell{ text-align:center; }
+
+  .export-btn{
+    background: var(--mint);
+    color: var(--forest);
+    border: 1px solid var(--mint);
+    padding: 8px 14px;
+    border-radius:3px;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12.5px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition: background .18s ease, opacity .18s ease;
+  }
+  .export-btn:hover:not(:disabled){ background: var(--teal); color:#fff; }
+  .export-btn:disabled{ opacity:.45; cursor:not-allowed; }
+
+  .btn-excel{
+    background: var(--mint);
+    color: var(--forest);
+    border: 1px solid var(--mint);
+  }
+  .btn-excel:hover{ background: var(--forest); color:#fff; }
+
+  .doctype-badge{
+    font-family: var(--font-mono);
+    font-size:11px;
+    padding: 4px 9px;
+    border-radius:4px;
+    background: rgba(66,132,117,.08);
+    color: var(--teal);
+    border: 1px solid rgba(66,132,117,.25);
+    white-space:nowrap;
+    display:inline-block;
+  }
+
+  .note-sub{
+    font-size:12px;
+    font-weight:400;
+    color:#5A6E67;
+    margin-top:2px;
+  }
+
+  /* ---------- Fiscal situation ---------- */
+  .fiscal-card{
+    background:#fff;
+    border-radius:6px;
+    border: 1px solid rgba(26,49,44,.08);
+    box-shadow: 0 1px 3px rgba(26,49,44,.05);
+    overflow:auto;
+  }
+  .fiscal-card table{ width:100%; border-collapse:collapse; min-width:520px; }
+  .fiscal-card thead th{
+    text-align:left;
+    font-family: var(--font-mono);
+    font-size:10px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color: var(--teal);
+    padding: 10px 12px;
+    border-bottom: 1.5px solid rgba(66,132,117,.25);
+    background: rgba(137,215,183,.06);
+    white-space:nowrap;
+  }
+  .fiscal-card td{
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(26,49,44,.06);
+    font-size:12.5px;
+    color: var(--text-on-cream);
+    vertical-align:middle;
+    white-space:nowrap;
+  }
+  .fiscal-card tbody tr:last-child td{ border-bottom:none; }
+  .fiscal-card tbody tr:hover{ background: rgba(255,244,225,.5); }
+  .fiscal-month-cell{ font-weight:600; color: var(--forest); white-space:nowrap; }
+  .fiscal-due-date{ font-family: var(--font-mono); font-size:11.5px; color:#8A9A93; white-space:nowrap; }
+  .fiscal-amount-input{
+    border: 1px solid rgba(26,49,44,.15);
+    border-radius:4px;
+    padding: 5px 7px;
+    font-family: var(--font-body);
+    font-size:12px;
+    color: var(--text-on-cream);
+    background:#fff;
+    width:100%;
+    min-width:90px;
+    text-align:right;
+  }
+  .fiscal-status-select{
+    border-radius:20px;
+    padding: 4px 10px;
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    cursor:pointer;
+    border:1px solid transparent;
+  }
+  .status-en_attente{ background: rgba(66,132,117,.12); color: var(--teal); border-color: rgba(66,132,117,.3); }
+  .status-depose{ background: rgba(74,144,217,.14); color:#2E5A87; border-color: rgba(74,144,217,.3); }
+  .status-paye{ background: rgba(137,215,183,.28); color:#1A312C; border-color: rgba(66,132,117,.35); }
+  .status-en_retard{ background: rgba(166,67,45,.1); color: var(--ink-red); border-color: rgba(166,67,45,.3); }
+
+  /* ---------- Payments ---------- */
+  .payment-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 14px 20px;
+    border-top: 1px solid rgba(26,49,44,.07);
+    gap: 14px;
+    flex-wrap:wrap;
+  }
+  .payment-row:first-child{ border-top:none; }
+  .payment-info{ display:flex; flex-direction:column; gap:3px; min-width:0; flex:1; }
+  .payment-label{ font-weight:600; font-size:14px; color: var(--forest); }
+  .payment-meta{ font-family: var(--font-mono); font-size:11px; color:#8A9A93; }
+  .payment-amount{ font-family: var(--font-mono); font-size:15px; font-weight:600; color: var(--forest); flex-shrink:0; }
+  .pill-paid{ background: rgba(137,215,183,.28); color:#1A312C; border:1px solid rgba(66,132,117,.35); }
+  .pill-unpaid{ background: rgba(166,67,45,.1); color: var(--ink-red); border:1px solid rgba(166,67,45,.3); }
+  .payment-status-pill{
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight:600;
+    flex-shrink:0;
+  }
+  .payment-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .btn-toggle-paid{
+    background: var(--teal);
+    color:#fff;
+    border: 1px solid var(--teal);
+    padding: 7px 12px;
+    border-radius:3px;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-toggle-paid:hover{ background: var(--forest); }
+  .btn-toggle-unpaid{
+    background: transparent;
+    color: var(--ink-red);
+    border: 1px solid rgba(166,67,45,.4);
+    padding: 7px 12px;
+    border-radius:3px;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-toggle-unpaid:hover{ background: var(--ink-red); color:#fff; }
+
+  /* ---------- Messagerie (floating widget) ---------- */
+  .chat-messages{
+    flex:1;
+    overflow-y:auto;
+    padding: 16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    background: var(--cream-dim);
+  }
+  .chat-bubble{
+    max-width: 72%;
+    padding: 9px 13px;
+    border-radius: 14px;
+    font-size:13.5px;
+    line-height:1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .chat-bubble.own{
+    align-self:flex-end;
+    background: var(--teal);
+    color:#fff;
+    border-bottom-right-radius:4px;
+  }
+  .chat-bubble.other{
+    align-self:flex-start;
+    background:#fff;
+    border: 1px solid rgba(26,49,44,.1);
+    color: var(--text-on-cream);
+    border-bottom-left-radius:4px;
+  }
+  .chat-meta{
+    font-family: var(--font-mono);
+    font-size:10px;
+    margin-top:4px;
+    opacity:.65;
+  }
+  .chat-empty{
+    text-align:center;
+    color:#8A9A93;
+    font-family: var(--font-mono);
+    font-size:12.5px;
+    padding: 30px;
+    margin:auto;
+  }
+  .chat-input-row{
+    display:flex;
+    gap:8px;
+    padding: 12px;
+    border-top: 1px solid rgba(26,49,44,.08);
+    background:#fff;
+  }
+  .chat-input{
+    flex:1;
+    resize:none;
+    border: 1px solid rgba(26,49,44,.18);
+    border-radius:6px;
+    padding: 9px 12px;
+    font-family: var(--font-body);
+    font-size:13.5px;
+    color: var(--text-on-cream);
+    max-height: 90px;
+  }
+  .chat-input:focus-visible{ outline: 2px solid var(--mint); outline-offset:1px; }
+  .chat-send-btn{
+    background: var(--teal);
+    color:#fff;
+    border: 1px solid var(--teal);
+    border-radius:6px;
+    padding: 0 18px;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    transition: background .18s ease;
+  }
+  .chat-send-btn:hover:not(:disabled){ background: var(--forest); }
+  .chat-send-btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+  /* ---------- Floating chat widget ---------- */
+  .chat-fab{
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--forest);
+    color: var(--cream);
+    border: none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow: 0 6px 20px rgba(18,36,32,.35);
+    z-index: 900;
+    transition: transform .18s ease, background .18s ease;
+  }
+  .chat-fab:hover{ background: var(--forest-deep); transform: translateY(-2px); }
+  .chat-fab svg{ width:24px; height:24px; }
+  .chat-fab-badge{
+    position:absolute;
+    top:-3px;
+    right:-3px;
+    background: var(--ink-red);
+    color:#fff;
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    font-weight:700;
+    min-width:19px;
+    height:19px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 4px;
+    border: 2px solid var(--cream);
+  }
+  .chat-fab-badge.hidden{ display:none; }
+
+  .chat-widget{
+    position: fixed;
+    right: 24px;
+    bottom: 92px;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    border-radius: 10px;
+    overflow:hidden;
+    box-shadow: 0 14px 40px rgba(18,36,32,.32);
+    z-index: 900;
+    opacity:0;
+    transform: translateY(12px) scale(.98);
+    pointer-events:none;
+    transition: opacity .18s ease, transform .18s ease;
+    background:#fff;
+    display:flex;
+    flex-direction:column;
+  }
+  .chat-widget.open{
+    opacity:1;
+    transform: translateY(0) scale(1);
+    pointer-events:auto;
+  }
+  .chat-widget-header{
+    background: linear-gradient(120deg, var(--forest) 0%, var(--forest-deep) 100%);
+    color: var(--cream);
+    padding: 13px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-shrink:0;
+  }
+  .chat-widget-header .title{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:15px;
+  }
+  .chat-widget-close{
+    background: transparent;
+    border:none;
+    color: var(--cream);
+    cursor:pointer;
+    padding:4px;
+    display:flex;
+    opacity:.75;
+    transition: opacity .15s ease;
+  }
+  .chat-widget-close:hover{ opacity:1; }
+  .chat-widget-client-bar{
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(26,49,44,.08);
+    background: #fff;
+    flex-shrink:0;
+  }
+  .chat-widget .chat-messages{ height: 340px; }
+
+  @media (max-width: 480px){
+    .chat-widget{
+      right: 16px;
+      left: 16px;
+      bottom: 88px;
+      width:auto;
+    }
+    .chat-fab{ right:16px; bottom:16px; }
+  }
+
+  /* ---------- Deliverables (accountant -> client uploads) ---------- */
+  .deliverable-upload{ padding: 18px 20px; }
+  .deliverable-upload-row{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .deliverable-upload-row .form-group{ flex:1; min-width:180px; margin-bottom:0; }
+
+  .upload-zone{
+    border: 1.5px dashed rgba(66,132,117,.4);
+    border-radius:6px;
+    padding: 22px 18px;
+    text-align:center;
+    cursor:pointer;
+    margin: 0 0 6px;
+    transition: border-color .18s ease, background .18s ease;
+  }
+  .upload-zone:hover, .upload-zone.dragover{
+    border-color: var(--teal);
+    background: rgba(137,215,183,.08);
+  }
+  .upload-zone input[type="file"]{ display:none; }
+  .upload-icon{ color: var(--teal); margin: 0 auto 8px; display:block; }
+  .upload-text{ font-size:13.5px; font-weight:600; color: var(--text-on-cream); }
+  .upload-sub{
+    font-family: var(--font-mono);
+    font-size:11px;
+    color:#8A9A93;
+    margin-top:4px;
+    letter-spacing:.02em;
+  }
+  .upload-status{
+    font-family: var(--font-mono);
+    font-size:12px;
+    text-align:center;
+    margin: 0;
+    min-height:16px;
+  }
+  .upload-status.uploading{ color: var(--teal); }
+  .upload-status.success{ color: var(--teal); }
+  .upload-status.error{ color: var(--ink-red); }
+
+  .invoice-actions{ display:flex; gap:5px; flex-wrap:wrap; }
+  .invoice-actions button{ padding: 6px 9px; font-size: 11.5px; }
+  .btn-download{
+    background: transparent;
+    color: var(--teal);
+    border: 1px solid rgba(66,132,117,.35);
+  }
+  .btn-download:hover{ background: var(--teal); color:#fff; }
+
+  .delete-msg{
+    background: transparent;
+    color: var(--ink-red);
+    border: 1px solid rgba(166,67,45,.4);
+    white-space: nowrap;
+  }
+  .delete-msg:hover{ background: var(--ink-red); color:#fff; border-color: var(--ink-red); }
+
+  .empty, .loading, .error-state{
+    padding: 48px 20px;
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size:13px;
+    color:#8A9A93;
+  }
+  .error-state{ color: var(--ink-red); }
+
+  /* ---------- Modals ---------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background: rgba(18,36,32,.55);
+    backdrop-filter: blur(2px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:1000;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .16s ease;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+
+  .modal-box{
+    background:#fff;
+    border-radius:8px;
+    max-width: 400px;
+    width:100%;
+    padding: 26px 26px 20px;
+    box-shadow: 0 12px 36px rgba(18,36,32,.28);
+    transform: translateY(6px) scale(.98);
+    transition: transform .16s ease;
+  }
+  .modal-overlay.open .modal-box{ transform: translateY(0) scale(1); }
+
+  .modal-eyebrow{
+    font-family: var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color: var(--ink-red);
+    display:block;
+    margin-bottom:8px;
+  }
+  #requestOverlay .modal-eyebrow{ color: var(--teal); }
+
+  .modal-box h3{
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:19px;
+    color: var(--forest);
+    margin:0 0 10px;
+  }
+  .modal-box p{
+    font-size:14px;
+    line-height:1.55;
+    color:#5A6E67;
+    margin:0 0 22px;
+  }
+  .modal-box p strong{ color: var(--text-on-cream); }
+
+  .form-group{ margin-bottom:14px; }
+  .form-label{
+    display:block;
+    font-family: var(--font-mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#8A9A93;
+    margin-bottom:6px;
+  }
+  .form-select, .form-textarea{
+    width:100%;
+    padding: 9px 12px;
+    border-radius:4px;
+    border: 1px solid rgba(26,49,44,.18);
+    background:#fff;
+    color: var(--text-on-cream);
+    font-family: var(--font-body);
+    font-size:13px;
+  }
+  .form-textarea{ resize:vertical; }
+  .form-select:focus-visible, .form-textarea:focus-visible{ outline: 2px solid var(--mint); outline-offset:1px; }
+
+  .modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+  }
+  .modal-cancel{
+    background: transparent;
+    color: var(--text-on-cream);
+    border: 1px solid rgba(26,49,44,.18);
+  }
+  .modal-cancel:hover{ background: rgba(26,49,44,.05); }
+  .modal-confirm{
+    background: var(--ink-red);
+    color:#fff;
+    border: 1px solid var(--ink-red);
+  }
+  .modal-confirm:hover{ background:#8a3626; }
+  .modal-confirm.teal{ background: var(--teal); border-color: var(--teal); }
+  .modal-confirm.teal:hover{ background: var(--forest); }
+
+  :focus-visible{ outline: 2px solid var(--mint); outline-offset: 2px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px){
+    .sidebar{ transform: translateX(-100%); }
+    .sidebar.open{ transform: translateX(0); }
+    .main-content{ margin-left:0; }
+    .mobile-topbar{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding: 14px 18px;
+      background: linear-gradient(120deg, var(--forest) 0%, var(--forest-deep) 100%);
+      color: var(--cream);
+      position:sticky;
+      top:0;
+      z-index:400;
+    }
+    .mobile-topbar button{
+      background:transparent; border:none; color:var(--cream); cursor:pointer;
+      padding:4px; display:flex;
+    }
+    .mobile-topbar .mobile-title{
+      font-family: var(--font-display);
+      font-weight:600;
+      font-size:16px;
+    }
+    .content-inner{ padding: 22px 18px 48px; }
+  }
+
+  @media (max-width: 640px){
+    thead{ display:none; }
+    table, tbody, tr, td{ display:block; width:100%; }
+    tr{ padding: 16px 4px; border-bottom:1px solid rgba(26,49,44,.08); }
+    td{ border:none; padding:4px 16px; }
+    .row-num{ display:none; }
+    .actions{ padding-top:8px; }
+    .msg-preview{ max-width:none; }
+    .request-btn{ margin-left:0; }
+    .grid-2col{ grid-template-columns:1fr; }
+    .fiscal-card table{ min-width:0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebarMobile()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <svg class="mini-seal" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="18.5" fill="none" stroke="#89D7B7" stroke-opacity=".55" stroke-width="1"/>
+      <circle cx="20" cy="20" r="12.5" fill="none" stroke="#FFF4E1" stroke-opacity=".85" stroke-width="1"/>
+      <text x="20" y="24" text-anchor="middle" font-family="Fraunces, serif" font-weight="600" font-size="9" fill="#FFF4E1">CB</text>
+    </svg>
+    <div class="brand-text">
+      <span class="name">CBSB</span>
+      <span class="zone">Administration</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">Sections</span>
+
+    <button class="nav-item active" data-panel="panel-accounts" data-label="Comptes en attente" onclick="switchPanel('panel-accounts', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg>
+      <span class="label">Comptes en attente</span>
+      <span class="nav-badge zero" id="navBadgeAccounts">0</span>
+    </button>
+
+    <button class="nav-item" data-panel="panel-messages" data-label="Messages clients" onclick="switchPanel('panel-messages', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+      <span class="label">Messages clients</span>
+      <span class="nav-badge zero" id="navBadgeMessages">0</span>
+    </button>
+
+    <button class="nav-item" data-panel="panel-documents" data-label="Documents clients" onclick="switchPanel('panel-documents', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>
+      <span class="label">Documents clients</span>
+      <span class="nav-badge zero" id="navBadgeDocuments">0</span>
+    </button>
+
+    <button class="nav-item" data-panel="panel-deliverables" data-label="Livrables" onclick="switchPanel('panel-deliverables', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 .5 9"/><path d="M12 12v9"/><path d="m9 15 3-3 3 3"/></svg>
+      <span class="label">Livrables</span>
+      <span class="nav-badge zero" id="navBadgeDeliverables">0</span>
+    </button>
+
+    <button class="nav-item" data-panel="panel-fiscal" data-label="Situation fiscale" onclick="switchPanel('panel-fiscal', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/><path d="M8 15h.01"/><path d="M12 15h.01"/><path d="M16 15h.01"/></svg>
+      <span class="label">Situation fiscale</span>
+    </button>
+
+    <button class="nav-item" data-panel="panel-payments" data-label="Paiements" onclick="switchPanel('panel-payments', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      <span class="label">Paiements</span>
+      <span class="nav-badge zero" id="navBadgePayments">0</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="login" class="logout" onclick="sessionStorage.clear()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      Se déconnecter
+    </a>
+  </div>
+</aside>
+
+<div class="mobile-topbar">
+  <button onclick="toggleSidebarMobile()" aria-label="Ouvrir le menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/></svg>
+  </button>
+  <span class="mobile-title" id="mobileTitle">Comptes en attente</span>
+</div>
+
+<div class="main-content">
+  <div class="content-inner">
+
+    <!-- ===== Panel: Comptes en attente ===== -->
+    <section class="panel active" id="panel-accounts">
+      <div class="page-head">
+        <span class="eyebrow">Gestion des accès</span>
+        <h2>Comptes en attente de validation</h2>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card accent">
+          <span class="kpi-label">Dossiers à traiter</span>
+          <span class="kpi-value" id="countChip">-</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="content"><p class="loading">Chargement des dossiers...</p></div>
+      </div>
+    </section>
+
+    <!-- ===== Panel: Messages clients ===== -->
+    <section class="panel" id="panel-messages">
+      <div class="page-head">
+        <span class="eyebrow">Boîte de réception</span>
+        <h2>Messages clients</h2>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Messages reçus</span>
+          <span class="kpi-value" id="msgCountChip">-</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="messagesContent"><p class="loading">Chargement des messages...</p></div>
+      </div>
+    </section>
+
+    <!-- ===== Panel: Documents clients ===== -->
+    <section class="panel" id="panel-documents">
+      <div class="page-head">
+        <span class="eyebrow">Documents</span>
+        <h2>Documents clients</h2>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Documents reçus</span>
+          <span class="kpi-value" id="invoiceCountChip">-</span>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <select id="filterClient" class="filter-select"><option value="">Tous les clients</option></select>
+        <select id="filterDocType" class="filter-select"><option value="">Tous les types</option></select>
+        <button class="export-btn" id="exportSelectionBtn" onclick="exportInvoicesExcel(Array.from(selectedInvoiceIds))" disabled>Exporter la sélection (Excel)</button>
+        <button class="request-btn" onclick="openRequestModal()">+ Demander un document</button>
+      </div>
+
+      <div class="card">
+        <div id="invoicesContent"><p class="loading">Chargement des documents...</p></div>
+      </div>
+    </section>
+
+    <!-- ===== Panel: Livrables ===== -->
+    <section class="panel" id="panel-deliverables">
+      <div class="page-head">
+        <span class="eyebrow">Documents du cabinet</span>
+        <h2>Livrables envoyés aux clients</h2>
+      </div>
+
+      <div class="grid-2col" style="margin-bottom:20px;">
+        <div class="kpi-grid" style="margin-bottom:0;">
+          <div class="kpi-card">
+            <span class="kpi-label">Livrables envoyés</span>
+            <span class="kpi-value" id="deliverableCountChip">-</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="deliverable-upload">
+            <div class="deliverable-upload-row">
+              <div class="form-group">
+                <label class="form-label">Client</label>
+                <select id="deliverableClientSelect" class="form-select"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Type de document</label>
+                <select id="deliverableTypeSelect" class="form-select"></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Note (optionnel)</label>
+              <input type="text" id="deliverableNote" class="form-select" style="width:100%;" placeholder="Ex. Bilan exercice 2024">
+            </div>
+            <div class="upload-zone" id="deliverableUploadZone">
+              <input type="file" id="deliverableFileInput" accept="application/pdf,.pdf">
+              <svg class="upload-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M6 10l6-6 6 6"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+              <div class="upload-text">Glissez un PDF ici ou cliquez pour parcourir</div>
+              <div class="upload-sub">Format PDF uniquement · 10 Mo max</div>
+            </div>
+            <p class="upload-status" id="deliverableUploadStatus"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <select id="filterDeliverableClient" class="filter-select"><option value="">Tous les clients</option></select>
+        <select id="filterDeliverableType" class="filter-select"><option value="">Tous les types</option></select>
+      </div>
+
+      <div class="card">
+        <div id="deliverablesContent"><p class="loading">Chargement des livrables...</p></div>
+      </div>
+    </section>
+
+    <!-- ===== Panel: Situation fiscale ===== -->
+    <section class="panel" id="panel-fiscal">
+      <div class="page-head">
+        <span class="eyebrow">Fiscalité</span>
+        <h2>Situation fiscale</h2>
+      </div>
+
+      <div class="filter-bar">
+        <select id="fiscalClientSelect" class="filter-select" style="min-width:240px;"><option value="">Sélectionner un client...</option></select>
+        <select id="fiscalYearSelect" class="filter-select"></select>
+        <button class="request-btn" id="createFiscalBtn" onclick="openCreateFiscalModal()" style="display:none;">+ Créer la situation fiscale</button>
+      </div>
+
+      <div id="fiscalEmptyState" class="empty">Sélectionnez un client pour voir sa situation fiscale.</div>
+
+      <div id="fiscalContent" class="section-grid" style="display:none;">
+        <div>
+          <div class="fiscal-subhead" style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <h3 class="section-title" style="margin-bottom:0;">Situation fiscale mensuelle</h3>
+            <span class="doctype-badge" id="fiscalClientTypeBadge"></span>
+          </div>
+          <div class="fiscal-card">
+            <table>
+              <thead><tr>
+                <th>Mois</th><th>Type</th><th>Échéance</th><th>Statut</th>
+              </tr></thead>
+              <tbody id="monthlyFiscalBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <div>
+            <h3 class="section-title">Situation fiscale annuelle</h3>
+            <div class="fiscal-card">
+              <table>
+                <thead><tr>
+                  <th>Type de déclaration</th><th>Date limite</th><th>Montant</th><th>Statut</th>
+                </tr></thead>
+                <tbody id="annualFiscalBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="section-title">Acomptes provisionnels</h3>
+            <div class="fiscal-card">
+              <table>
+                <thead><tr>
+                  <th>Acompte</th><th>Date limite</th><th>Montant</th><th>Statut</th>
+                </tr></thead>
+                <tbody id="provisionalFiscalBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Panel: Paiements ===== -->
+    <section class="panel" id="panel-payments">
+      <div class="page-head">
+        <span class="eyebrow">Facturation</span>
+        <h2>Paiements</h2>
+      </div>
+
+      <div class="grid-2col" style="margin-bottom:20px;">
+        <div class="kpi-grid" style="margin-bottom:0;">
+          <div class="kpi-card">
+            <span class="kpi-label">Paiements enregistrés</span>
+            <span class="kpi-value" id="paymentCountChip">-</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="deliverable-upload">
+            <div class="deliverable-upload-row">
+              <div class="form-group">
+                <label class="form-label">Client</label>
+                <select id="newPaymentClientSelect" class="form-select"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Libellé</label>
+                <input type="text" id="newPaymentLabel" class="form-select" style="width:100%;" placeholder="Ex. Honoraires Janvier 2026">
+              </div>
+            </div>
+            <div class="deliverable-upload-row">
+              <div class="form-group">
+                <label class="form-label">Montant (€)</label>
+                <input type="number" step="0.01" id="newPaymentAmount" class="form-select" style="width:100%;" placeholder="0.00">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Échéance (optionnel)</label>
+                <input type="date" id="newPaymentDueDate" class="form-select" style="width:100%;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Note (optionnel)</label>
+              <input type="text" id="newPaymentNote" class="form-select" style="width:100%;" placeholder="Précision...">
+            </div>
+            <button class="request-btn" style="margin:0;" onclick="createPayment()">+ Ajouter le paiement</button>
+            <p class="upload-status" id="newPaymentStatus" style="margin-top:8px;"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <select id="filterPaymentClient" class="filter-select"><option value="">Tous les clients</option></select>
+        <select id="filterPaymentStatus" class="filter-select">
+          <option value="">Tous les statuts</option>
+          <option value="unpaid">Impayé</option>
+          <option value="paid">Payé</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div id="paymentsContent"><p class="loading">Chargement des paiements...</p></div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<button class="chat-fab" id="chatFab" onclick="toggleChatWidget()" aria-label="Ouvrir la messagerie">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  <span class="chat-fab-badge hidden" id="chatFabBadge">0</span>
+</button>
+
+<div class="chat-widget" id="chatWidget">
+  <div class="chat-widget-header">
+    <span class="title">Messagerie</span>
+    <button class="chat-widget-close" onclick="toggleChatWidget(false)" aria-label="Fermer la messagerie">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
+  <div class="chat-widget-client-bar">
+    <select id="messagingClientSelect" class="filter-select" style="width:100%;"><option value="">Sélectionner un client...</option></select>
+  </div>
+  <div class="chat-messages" id="adminChatMessages"><p class="chat-empty">Sélectionnez un client pour voir la conversation.</p></div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="adminChatInput" rows="1" placeholder="Répondre au client..." disabled></textarea>
+    <button class="chat-send-btn" id="adminChatSendBtn" onclick="sendAdminMessage()" disabled>Envoyer</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-box">
+    <span class="modal-eyebrow">Action requise</span>
+    <h3 id="confirmTitle">Confirmer l'action</h3>
+    <p id="confirmText">Êtes-vous sûr ?</p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeConfirm()">Annuler</button>
+      <button class="modal-confirm" id="confirmBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="requestOverlay">
+  <div class="modal-box">
+    <span class="modal-eyebrow">Nouvelle demande</span>
+    <h3>Demander un document</h3>
+    <div class="form-group">
+      <label class="form-label">Client</label>
+      <select id="requestClientSelect" class="form-select"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Type de document</label>
+      <select id="requestDocTypeSelect" class="form-select"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Note (optionnel)</label>
+      <textarea id="requestNote" class="form-textarea" rows="2" placeholder="Précision pour le client..."></textarea>
+    </div>
+    <p class="upload-status" id="requestStatus" style="text-align:left;margin:0 0 14px;font-family:var(--font-mono);font-size:12px;min-height:16px;"></p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeRequestModal()">Annuler</button>
+      <button class="modal-confirm teal" id="requestSubmitBtn" onclick="submitDocumentRequest()">Envoyer la demande</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="createFiscalOverlay">
+  <div class="modal-box">
+    <span class="modal-eyebrow" style="color:var(--teal);">Nouvelle situation fiscale</span>
+    <h3>Créer la situation fiscale <span id="createFiscalYearLabel"></span></h3>
+    <div class="form-group">
+      <label class="form-label">Type de contribuable</label>
+      <select id="createFiscalClientType" class="form-select">
+        <option value="personne_physique">Personne Physique</option>
+        <option value="personne_morale">Personne Morale</option>
+      </select>
+    </div>
+    <p class="upload-status" id="createFiscalStatus" style="text-align:left;margin:0 0 14px;"></p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeCreateFiscalModal()">Annuler</button>
+      <button class="modal-confirm teal" onclick="submitCreateFiscalSituation()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+const token = sessionStorage.getItem("token");
+
+const DOC_TYPES = [
+  { value: "purchase_invoice", label: "Factures d'achat" },
+  { value: "sales_invoice", label: "Factures de vente" },
+  { value: "bank_statement", label: "Relevés bancaires" },
+  { value: "tax_declaration", label: "Déclarations fiscales" },
+  { value: "payslip", label: "Bulletins de paie" },
+  { value: "contract", label: "Contrats" },
+];
+
+function docTypeLabel(value) {
+  const found = DOC_TYPES.find(d => d.value === value);
+  return found ? found.label : value;
+}
+
+const DELIVERABLE_TYPES = [
+  { value: "bilan", label: "Bilan" },
+  { value: "liasse_fiscale", label: "Liasse fiscale" },
+  { value: "rapport", label: "Rapport" },
+  { value: "autre", label: "Autre document" },
+];
+
+function deliverableTypeLabel(value) {
+  const found = DELIVERABLE_TYPES.find(d => d.value === value);
+  return found ? found.label : value;
+}
+
+if (!token || sessionStorage.getItem("role") !== "admin") {
+  window.location.href = "/login";
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML;
+}
+
+function formatDate(iso) {
+  try {
+    return new Date(iso).toLocaleString("fr-FR", {
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit"
+    });
+  } catch {
+    return iso;
+  }
+}
+
+/* ---------- Confirm modal ---------- */
+const confirmOverlay = document.getElementById("confirmOverlay");
+const confirmTitle = document.getElementById("confirmTitle");
+const confirmText = document.getElementById("confirmText");
+const confirmBtn = document.getElementById("confirmBtn");
+
+function openConfirm({ title, text, onConfirm }) {
+  confirmTitle.textContent = title;
+  confirmText.innerHTML = text;
+  confirmBtn.onclick = () => {
+    closeConfirm();
+    onConfirm();
+  };
+  confirmOverlay.classList.add("open");
+}
+function closeConfirm() {
+  confirmOverlay.classList.remove("open");
+  confirmBtn.onclick = null;
+}
+confirmOverlay.addEventListener("click", (e) => {
+  if (e.target === confirmOverlay) closeConfirm();
+});
+
+/* ---------- Request modal ---------- */
+const requestOverlay = document.getElementById("requestOverlay");
+function openRequestModal() {
+  document.getElementById("requestNote").value = "";
+  const status = document.getElementById("requestStatus");
+  status.textContent = "";
+  status.className = "";
+  requestOverlay.classList.add("open");
+}
+function closeRequestModal() {
+  requestOverlay.classList.remove("open");
+}
+requestOverlay.addEventListener("click", (e) => {
+  if (e.target === requestOverlay) closeRequestModal();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeConfirm();
+    closeRequestModal();
+  }
+});
+
+async function submitDocumentRequest() {
+  const clientId = document.getElementById("requestClientSelect").value;
+  const docType = document.getElementById("requestDocTypeSelect").value;
+  const note = document.getElementById("requestNote").value.trim();
+  const status = document.getElementById("requestStatus");
+  const btn = document.getElementById("requestSubmitBtn");
+
+  if (!clientId) {
+    status.textContent = "Sélectionnez un client.";
+    status.style.color = "var(--ink-red)";
+    return;
+  }
+
+  btn.disabled = true;
+  status.textContent = "Envoi en cours...";
+  status.style.color = "var(--teal)";
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/document-requests`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ client_id: Number(clientId), doc_type: docType, note: note || null })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Échec de la demande.");
+
+    status.textContent = "Demande envoyée avec succès.";
+    status.style.color = "var(--teal)";
+    setTimeout(closeRequestModal, 900);
+  } catch (err) {
+    status.textContent = `Erreur : ${err.message}`;
+    status.style.color = "var(--ink-red)";
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ---------- Pending users ---------- */
+async function loadPending() {
+  const content = document.getElementById("content");
+  const countChip = document.getElementById("countChip");
+  try {
+    const res = await fetch(`${API_BASE}/admin/pending-users`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const users = await res.json();
+    if (!res.ok) throw new Error(users.detail);
+
+    countChip.textContent = users.length === 0
+      ? "0 dossier"
+      : `${users.length} dossier${users.length > 1 ? "s" : ""} en attente`;
+
+    if (users.length === 0) {
+      content.innerHTML = '<p class="empty">Aucune demande en attente pour le moment.</p>';
+      return;
+    }
+
+    let html = `<table>
+      <thead><tr>
+        <th>N°</th><th>Nom</th><th>Entreprise</th><th>Email</th><th>Actions</th>
+      </tr></thead><tbody>`;
+
+    users.forEach((u, i) => {
+      const ref = String(i + 1).padStart(3, "0");
+      html += `<tr>
+        <td class="row-num">${ref}</td>
+        <td class="cell-name">${escapeHtml(u.full_name) || "-"}</td>
+        <td>${escapeHtml(u.company_name) || "-"}</td>
+        <td class="cell-email">${escapeHtml(u.email)}</td>
+        <td>
+          <div class="actions">
+            <button class="approve" onclick="approve(${u.id}, this)">Valider</button>
+            <button class="reject" onclick="reject(${u.id}, this)">Rejeter</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function approve(id, btn) {
+  const row = btn.closest("tr");
+  row.querySelectorAll("button").forEach(b => b.disabled = true);
+  try {
+    await fetch(`${API_BASE}/admin/approve-user/${id}`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+  } finally {
+    loadPending();
+  }
+}
+
+async function reject(id, btn) {
+  const row = btn.closest("tr");
+  const name = row.querySelector(".cell-name")?.textContent || "ce dossier";
+  openConfirm({
+    title: "Rejeter le dossier",
+    text: `Voulez-vous vraiment rejeter la demande de <strong>${escapeHtml(name)}</strong> ? Cette action est irréversible.`,
+    onConfirm: async () => {
+      row.querySelectorAll("button").forEach(b => b.disabled = true);
+      try {
+        await fetch(`${API_BASE}/admin/reject-user/${id}`, {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } finally {
+        loadPending();
+      }
+    }
+  });
+}
+
+/* ---------- Messages ---------- */
+async function loadMessages() {
+  const content = document.getElementById("messagesContent");
+  const countChip = document.getElementById("msgCountChip");
+  try {
+    const res = await fetch(`${API_BASE}/admin/contact-messages`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const messages = await res.json();
+    if (!res.ok) throw new Error(messages.detail);
+
+    countChip.textContent = messages.length === 0
+      ? "0 message"
+      : `${messages.length} message${messages.length > 1 ? "s" : ""}`;
+
+    if (messages.length === 0) {
+      content.innerHTML = '<p class="empty">Aucun message reçu pour le moment.</p>';
+      return;
+    }
+
+    let html = `<table>
+      <thead><tr>
+        <th>N°</th><th>Nom</th><th>Email</th><th>Sujet</th><th>Message</th><th>Reçu le</th><th></th>
+      </tr></thead><tbody>`;
+
+    messages.forEach((m, i) => {
+      const ref = String(i + 1).padStart(3, "0");
+      html += `<tr>
+        <td class="row-num">${ref}</td>
+        <td class="cell-name">${escapeHtml(m.name)}</td>
+        <td class="cell-email"><a href="mailto:${escapeHtml(m.email)}" style="color:inherit;">${escapeHtml(m.email)}</a></td>
+        <td class="cell-subject">${escapeHtml(m.subject)}</td>
+        <td class="msg-preview">
+          <details>
+            <summary>${escapeHtml(m.message.slice(0, 40))}${m.message.length > 40 ? "…" : ""}</summary>
+            <p>${escapeHtml(m.message)}</p>
+          </details>
+        </td>
+        <td class="cell-date">${formatDate(m.created_at)}</td>
+        <td>
+          <button class="delete-msg" onclick="deleteMessage(${m.id}, this)">Supprimer</button>
+        </td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function deleteMessage(id, btn) {
+  const row = btn.closest("tr");
+  const name = row.querySelector(".cell-name")?.textContent || "ce message";
+  openConfirm({
+    title: "Supprimer le message",
+    text: `Voulez-vous vraiment supprimer le message de <strong>${escapeHtml(name)}</strong> ? Cette action est irréversible.`,
+    onConfirm: async () => {
+      btn.disabled = true;
+      try {
+        await fetch(`${API_BASE}/admin/contact-messages/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } finally {
+        loadMessages();
+      }
+    }
+  });
+}
+
+/* ---------- Clients (for filters + request modal) ---------- */
+async function loadClients() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/clients`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const clients = await res.json();
+    if (!res.ok) throw new Error(clients.detail);
+
+    const options = clients.map(c => {
+      const label = `${c.full_name || c.email}${c.company_name ? " — " + c.company_name : ""}`;
+      return `<option value="${c.id}">${escapeHtml(label)}</option>`;
+    }).join("");
+
+    document.getElementById("filterClient").innerHTML = '<option value="">Tous les clients</option>' + options;
+    document.getElementById("requestClientSelect").innerHTML = options;
+    document.getElementById("deliverableClientSelect").innerHTML = options;
+    document.getElementById("filterDeliverableClient").innerHTML = '<option value="">Tous les clients</option>' + options;
+    document.getElementById("fiscalClientSelect").innerHTML = '<option value="">Sélectionner un client...</option>' + options;
+    document.getElementById("newPaymentClientSelect").innerHTML = options;
+    document.getElementById("filterPaymentClient").innerHTML = '<option value="">Tous les clients</option>' + options;
+    clientsCache = clients;
+    renderMessagingClientOptions();
+  } catch (err) {
+    console.error("Erreur chargement clients:", err.message);
+  }
+}
+
+function populateDocTypeFilters() {
+  const filterOptions = DOC_TYPES.map(d => `<option value="${d.value}">${escapeHtml(d.label)}</option>`).join("");
+  document.getElementById("filterDocType").innerHTML = '<option value="">Tous les types</option>' + filterOptions;
+  document.getElementById("requestDocTypeSelect").innerHTML = filterOptions;
+}
+
+function populateDeliverableTypeSelects() {
+  const options = DELIVERABLE_TYPES.map(d => `<option value="${d.value}">${escapeHtml(d.label)}</option>`).join("");
+  document.getElementById("deliverableTypeSelect").innerHTML = options;
+  document.getElementById("filterDeliverableType").innerHTML = '<option value="">Tous les types</option>' + options;
+}
+
+/* ---------- Invoices / documents ---------- */
+const selectedInvoiceIds = new Set();
+
+function updateExportButtonState() {
+  document.getElementById("exportSelectionBtn").disabled = selectedInvoiceIds.size === 0;
+}
+
+function toggleInvoiceSelection(id, checked) {
+  if (checked) selectedInvoiceIds.add(id);
+  else selectedInvoiceIds.delete(id);
+
+  const selectAll = document.getElementById("selectAllCheckbox");
+  if (selectAll) {
+    const allChecked = document.querySelectorAll(".invoice-checkbox").length > 0 &&
+      document.querySelectorAll(".invoice-checkbox:not(:checked)").length === 0;
+    selectAll.checked = allChecked;
+  }
+  updateExportButtonState();
+}
+
+function toggleSelectAll(checked) {
+  document.querySelectorAll(".invoice-checkbox").forEach(cb => {
+    const id = Number(cb.dataset.id);
+    cb.checked = checked;
+    if (checked) selectedInvoiceIds.add(id);
+    else selectedInvoiceIds.delete(id);
+  });
+  updateExportButtonState();
+}
+
+async function exportInvoicesExcel(ids) {
+  if (!ids || ids.length === 0) return;
+  const btn = document.getElementById("exportSelectionBtn");
+  const previouslyDisabled = btn.disabled;
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/admin/invoices/export-excel`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ invoice_ids: ids })
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "Échec de la génération du fichier Excel.");
+    }
+
+    const blob = await res.blob();
+    const cd = res.headers.get("Content-Disposition") || "";
+    const match = cd.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : "export.xlsx";
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = previouslyDisabled;
+  }
+}
+
+async function loadInvoices() {
+  const content = document.getElementById("invoicesContent");
+  const countChip = document.getElementById("invoiceCountChip");
+
+  const clientId = document.getElementById("filterClient").value;
+  const docType = document.getElementById("filterDocType").value;
+  const params = new URLSearchParams();
+  if (clientId) params.set("client_id", clientId);
+  if (docType) params.set("doc_type", docType);
+  const qs = params.toString();
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/invoices${qs ? "?" + qs : ""}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const invoices = await res.json();
+    if (!res.ok) throw new Error(invoices.detail);
+
+    countChip.textContent = invoices.length === 0
+      ? "0 document"
+      : `${invoices.length} document${invoices.length > 1 ? "s" : ""}`;
+
+    if (invoices.length === 0) {
+      content.innerHTML = '<p class="empty">Aucun document trouvé.</p>';
+      return;
+    }
+
+    let html = `<table>
+      <thead><tr>
+        <th class="select-cell"><input type="checkbox" class="row-checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)"></th>
+        <th>N°</th><th>Client</th><th>Entreprise</th><th>Type</th><th>Fichier</th><th>Reçu le</th><th></th>
+      </tr></thead><tbody>`;
+
+    invoices.forEach((inv, i) => {
+      const ref = String(i + 1).padStart(3, "0");
+      const checked = selectedInvoiceIds.has(inv.id) ? "checked" : "";
+      html += `<tr>
+        <td class="select-cell"><input type="checkbox" class="row-checkbox invoice-checkbox" data-id="${inv.id}" ${checked} onchange="toggleInvoiceSelection(${inv.id}, this.checked)"></td>
+        <td class="row-num">${ref}</td>
+        <td class="cell-name">${escapeHtml(inv.client_name) || "-"}</td>
+        <td>${escapeHtml(inv.company_name) || "-"}</td>
+        <td><span class="doctype-badge">${escapeHtml(docTypeLabel(inv.doc_type))}</span></td>
+        <td class="cell-subject">${escapeHtml(inv.filename)}</td>
+        <td class="cell-date">${formatDate(inv.uploaded_at)}</td>
+        <td>
+          <div class="invoice-actions">
+            <button class="btn-download" onclick="downloadInvoice(${inv.id}, this)">Télécharger</button>
+            <button class="btn-excel" onclick="exportInvoicesExcel([${inv.id}])">Excel</button>
+            <button class="delete-msg" onclick="confirmDeleteInvoice(${inv.id}, this)">Supprimer</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function downloadInvoice(id, btn) {
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/admin/invoices/${id}/download`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Téléchargement impossible.");
+    const blob = await res.blob();
+    const cd = res.headers.get("Content-Disposition") || "";
+    const match = cd.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : "document.pdf";
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function confirmDeleteInvoice(id, btn) {
+  const row = btn.closest("tr");
+  const filename = row.querySelector(".cell-subject")?.textContent || "ce document";
+  openConfirm({
+    title: "Supprimer le document",
+    text: `Voulez-vous vraiment supprimer <strong>${escapeHtml(filename)}</strong> ? Cette action est irréversible.`,
+    onConfirm: async () => {
+      row.querySelectorAll("button").forEach(b => b.disabled = true);
+      try {
+        await fetch(`${API_BASE}/admin/invoices/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } finally {
+        loadInvoices();
+      }
+    }
+  });
+}
+
+/* ---------- Deliverables (accountant -> client) ---------- */
+function setDeliverableUploadStatus(text, kind) {
+  const status = document.getElementById("deliverableUploadStatus");
+  status.textContent = text;
+  status.className = "upload-status" + (kind ? " " + kind : "");
+}
+
+async function uploadDeliverable(file) {
+  const clientId = document.getElementById("deliverableClientSelect").value;
+  const docType = document.getElementById("deliverableTypeSelect").value;
+  const note = document.getElementById("deliverableNote").value.trim();
+
+  if (!clientId) {
+    setDeliverableUploadStatus("Sélectionnez un client avant d'envoyer.", "error");
+    return;
+  }
+  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+    setDeliverableUploadStatus("Seuls les fichiers PDF sont acceptés.", "error");
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    setDeliverableUploadStatus("Le fichier dépasse la taille maximale (10 Mo).", "error");
+    return;
+  }
+
+  setDeliverableUploadStatus(`Envoi de "${file.name}"...`, "uploading");
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("client_id", clientId);
+  formData.append("doc_type", docType);
+  if (note) formData.append("note", note);
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/deliverables`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` },
+      body: formData
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Échec de l'envoi du document.");
+
+    setDeliverableUploadStatus("Document envoyé au client.", "success");
+    document.getElementById("deliverableNote").value = "";
+    loadDeliverables();
+    setTimeout(() => setDeliverableUploadStatus(""), 3000);
+  } catch (err) {
+    setDeliverableUploadStatus(`Erreur : ${err.message}`, "error");
+  }
+}
+
+async function loadDeliverables() {
+  const content = document.getElementById("deliverablesContent");
+  const countChip = document.getElementById("deliverableCountChip");
+
+  const clientId = document.getElementById("filterDeliverableClient").value;
+  const docType = document.getElementById("filterDeliverableType").value;
+  const params = new URLSearchParams();
+  if (clientId) params.set("client_id", clientId);
+  if (docType) params.set("doc_type", docType);
+  const qs = params.toString();
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/deliverables${qs ? "?" + qs : ""}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const items = await res.json();
+    if (!res.ok) throw new Error(items.detail);
+
+    countChip.textContent = items.length === 0
+      ? "0 livrable"
+      : `${items.length} livrable${items.length > 1 ? "s" : ""}`;
+
+    if (items.length === 0) {
+      content.innerHTML = '<p class="empty">Aucun document envoyé pour le moment.</p>';
+      return;
+    }
+
+    let html = `<table>
+      <thead><tr>
+        <th>N°</th><th>Client</th><th>Entreprise</th><th>Type</th><th>Fichier</th><th>Envoyé le</th><th></th>
+      </tr></thead><tbody>`;
+
+    items.forEach((d, i) => {
+      const ref = String(i + 1).padStart(3, "0");
+      html += `<tr>
+        <td class="row-num">${ref}</td>
+        <td class="cell-name">${escapeHtml(d.client_name) || "-"}</td>
+        <td>${escapeHtml(d.company_name) || "-"}</td>
+        <td><span class="doctype-badge">${escapeHtml(deliverableTypeLabel(d.doc_type))}</span></td>
+        <td class="cell-subject">${escapeHtml(d.filename)}${d.note ? `<div class="note-sub">${escapeHtml(d.note)}</div>` : ""}</td>
+        <td class="cell-date">${formatDate(d.uploaded_at)}</td>
+        <td>
+          <div class="invoice-actions">
+            <button class="btn-download" onclick="downloadDeliverable(${d.id}, this)">Télécharger</button>
+            <button class="delete-msg" onclick="confirmDeleteDeliverable(${d.id}, this)">Supprimer</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    content.innerHTML = html;
+  } catch (err) {
+    content.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function downloadDeliverable(id, btn) {
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/admin/deliverables/${id}/download`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Téléchargement impossible.");
+    const blob = await res.blob();
+    const cd = res.headers.get("Content-Disposition") || "";
+    const match = cd.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : "document.pdf";
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function confirmDeleteDeliverable(id, btn) {
+  const row = btn.closest("tr");
+  const filename = row.querySelector(".cell-subject")?.textContent || "ce document";
+  openConfirm({
+    title: "Supprimer le document",
+    text: `Voulez-vous vraiment supprimer <strong>${escapeHtml(filename)}</strong> ? Le client n'y aura plus accès.`,
+    onConfirm: async () => {
+      row.querySelectorAll("button").forEach(b => b.disabled = true);
+      try {
+        await fetch(`${API_BASE}/admin/deliverables/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+      } finally {
+        loadDeliverables();
+      }
+    }
+  });
+}
+
+const deliverableUploadZone = document.getElementById("deliverableUploadZone");
+const deliverableFileInput = document.getElementById("deliverableFileInput");
+
+deliverableUploadZone.addEventListener("click", (e) => {
+  if (e.target === deliverableFileInput) return;
+  deliverableFileInput.click();
+});
+deliverableFileInput.addEventListener("change", () => {
+  if (deliverableFileInput.files[0]) uploadDeliverable(deliverableFileInput.files[0]);
+  deliverableFileInput.value = "";
+});
+["dragenter", "dragover"].forEach(evt =>
+  deliverableUploadZone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    deliverableUploadZone.classList.add("dragover");
+  })
+);
+["dragleave", "drop"].forEach(evt =>
+  deliverableUploadZone.addEventListener(evt, (e) => {
+    e.preventDefault();
+    deliverableUploadZone.classList.remove("dragover");
+  })
+);
+deliverableUploadZone.addEventListener("drop", (e) => {
+  const file = e.dataTransfer.files[0];
+  if (file) uploadDeliverable(file);
+});
+
+document.getElementById("filterDeliverableClient").addEventListener("change", loadDeliverables);
+document.getElementById("filterDeliverableType").addEventListener("change", loadDeliverables);
+
+/* ---------- Situation fiscale ---------- */
+const MONTH_LABELS_FR = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+
+const MONTHLY_TYPE_LABELS = {
+  declaration_mensuelle: "Déclaration mensuelle",
+  teledeclaration: "Télédéclaration",
+  paiement_recette: "Paiement recette",
+};
+const ANNUAL_TYPE_LABELS = {
+  activite_commerciale: "Activité commerciale",
+  autre_activite: "Autre activité",
+  declaration_annuelle: "Déclaration annuelle",
+  declaration_impot: "Déclaration d'impôt",
+};
+const FISCAL_STATUS_LABELS = {
+  // en_attente: "En attente",
+  // depose: "Déposé",
+  paye: "Payé",
+  en_retard: "En retard",
+};
+
+function formatMoney(value) {
+  return new Intl.NumberFormat("fr-TN", { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value) + " DT";
+}
+
+function formatShortDate(iso) {
+  if (!iso) return "-";
+  try {
+    return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  } catch {
+    return iso;
+  }
+}
+
+function statusSelectHtml(entityType, itemId, currentStatus) {
+  const options = Object.entries(FISCAL_STATUS_LABELS).map(([value, label]) =>
+    `<option value="${value}" ${value === currentStatus ? "selected" : ""}>${label}</option>`
+  ).join("");
+  return `<select class="fiscal-status-select status-${currentStatus}" onchange="updateFiscalLine('${entityType}', ${itemId}, {status: this.value}, this)">${options}</select>`;
+}
+
+function populateFiscalYearSelect() {
+  const select = document.getElementById("fiscalYearSelect");
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let y = currentYear + 1; y >= currentYear - 4; y--) years.push(y);
+  select.innerHTML = years.map(y => `<option value="${y}" ${y === currentYear ? "selected" : ""}>${y}</option>`).join("");
+}
+
+async function loadFiscalSituation() {
+  const clientId = document.getElementById("fiscalClientSelect").value;
+  const year = document.getElementById("fiscalYearSelect").value;
+  const emptyState = document.getElementById("fiscalEmptyState");
+  const content = document.getElementById("fiscalContent");
+  const createBtn = document.getElementById("createFiscalBtn");
+
+  if (!clientId) {
+    content.style.display = "none";
+    createBtn.style.display = "none";
+    emptyState.style.display = "block";
+    emptyState.textContent = "Sélectionnez un client pour voir sa situation fiscale.";
+    return;
+  }
+
+  emptyState.style.display = "block";
+  emptyState.textContent = "Chargement...";
+  content.style.display = "none";
+  createBtn.style.display = "none";
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/clients/${clientId}/fiscal-status?year=${year}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    if (res.status === 404) {
+      emptyState.innerHTML = `Aucune situation fiscale pour ${year}.`;
+      createBtn.style.display = "inline-block";
+      return;
+    }
+
+    const situation = await res.json();
+    if (!res.ok) throw new Error(situation.detail);
+
+    document.getElementById("fiscalClientTypeBadge").textContent =
+      situation.client_type === "personne_morale" ? "Personne Morale" : "Personne Physique";
+
+    renderMonthlyFiscal(situation.monthly_declarations);
+    renderAnnualFiscal(situation.annual_declarations);
+    renderProvisionalFiscal(situation.provisional_payments);
+
+    emptyState.style.display = "none";
+    content.style.display = "block";
+  } catch (err) {
+    emptyState.textContent = `Erreur : ${err.message}`;
+    emptyState.style.display = "block";
+    content.style.display = "none";
+  }
+}
+
+function renderMonthlyFiscal(rows) {
+  const tbody = document.getElementById("monthlyFiscalBody");
+  const sorted = [...rows].sort((a, b) => a.month - b.month || a.due_date.localeCompare(b.due_date));
+  tbody.innerHTML = sorted.map(r => `
+    <tr>
+      <td class="fiscal-month-cell">${MONTH_LABELS_FR[r.month - 1]}</td>
+      <td>${MONTHLY_TYPE_LABELS[r.declaration_type] || r.declaration_type}</td>
+      <td class="fiscal-due-date">${formatShortDate(r.due_date)}</td>
+      <td>${statusSelectHtml("monthly", r.id, r.status)}</td>
+    </tr>
+  `).join("");
+}
+
+function renderAnnualFiscal(rows) {
+  const tbody = document.getElementById("annualFiscalBody");
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td class="fiscal-month-cell">${ANNUAL_TYPE_LABELS[r.declaration_type] || r.declaration_type}</td>
+      <td class="fiscal-due-date">${formatShortDate(r.due_date)}</td>
+      <td><input type="number" step="0.001" class="fiscal-amount-input" value="${r.amount ?? ""}" placeholder="0.000" onchange="updateFiscalLine('annual', ${r.id}, {amount: this.value ? Number(this.value) : null}, this)"></td>
+      <td>${statusSelectHtml("annual", r.id, r.status)}</td>
+    </tr>
+  `).join("");
+}
+
+function renderProvisionalFiscal(rows) {
+  const tbody = document.getElementById("provisionalFiscalBody");
+  const labels = { 1: "1er", 2: "2ème", 3: "3ème" };
+  const sorted = [...rows].sort((a, b) => a.installment_number - b.installment_number);
+  tbody.innerHTML = sorted.map(r => `
+    <tr>
+      <td class="fiscal-month-cell">${labels[r.installment_number] || r.installment_number}</td>
+      <td class="fiscal-due-date">${formatShortDate(r.due_date)}</td>
+      <td><input type="number" step="0.001" class="fiscal-amount-input" value="${r.amount ?? ""}" placeholder="0.000" onchange="updateFiscalLine('provisional', ${r.id}, {amount: this.value ? Number(this.value) : null}, this)"></td>
+      <td>${statusSelectHtml("provisional", r.id, r.status)}</td>
+    </tr>
+  `).join("");
+}
+
+async function updateFiscalLine(entityType, itemId, changes, el) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/fiscal-status/${itemId}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ entity_type: entityType, ...changes })
+    });
+    if (!res.ok) throw new Error("Échec de la mise à jour.");
+
+    // Si le statut vient de changer, on rafraichit la couleur du badge sans tout recharger
+    if (changes.status && el && el.tagName === "SELECT") {
+      el.className = `fiscal-status-select status-${changes.status}`;
+    }
+  } catch (err) {
+    alert(err.message);
+    loadFiscalSituation(); // resynchronise en cas d'echec
+  }
+}
+
+function openCreateFiscalModal() {
+  document.getElementById("createFiscalYearLabel").textContent = document.getElementById("fiscalYearSelect").value;
+  document.getElementById("createFiscalStatus").textContent = "";
+  document.getElementById("createFiscalOverlay").classList.add("open");
+}
+function closeCreateFiscalModal() {
+  document.getElementById("createFiscalOverlay").classList.remove("open");
+}
+document.getElementById("createFiscalOverlay").addEventListener("click", (e) => {
+  if (e.target === document.getElementById("createFiscalOverlay")) closeCreateFiscalModal();
+});
+
+async function submitCreateFiscalSituation() {
+  const clientId = document.getElementById("fiscalClientSelect").value;
+  const year = document.getElementById("fiscalYearSelect").value;
+  const clientType = document.getElementById("createFiscalClientType").value;
+  const status = document.getElementById("createFiscalStatus");
+
+  status.textContent = "Création en cours...";
+  status.style.color = "var(--teal)";
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/clients/${clientId}/fiscal-status`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ year: Number(year), client_type: clientType })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Échec de la création.");
+
+    closeCreateFiscalModal();
+    loadFiscalSituation();
+  } catch (err) {
+    status.textContent = `Erreur : ${err.message}`;
+    status.style.color = "var(--ink-red)";
+  }
+}
+
+document.getElementById("fiscalClientSelect").addEventListener("change", loadFiscalSituation);
+document.getElementById("fiscalYearSelect").addEventListener("change", loadFiscalSituation);
+populateFiscalYearSelect();
+
+/* ---------- Paiements ---------- */
+function setNewPaymentStatus(text, kind) {
+  const status = document.getElementById("newPaymentStatus");
+  status.textContent = text;
+  status.className = "upload-status" + (kind ? " " + kind : "");
+}
+
+async function createPayment() {
+  const clientId = document.getElementById("newPaymentClientSelect").value;
+  const label = document.getElementById("newPaymentLabel").value.trim();
+  const amount = document.getElementById("newPaymentAmount").value;
+  const dueDate = document.getElementById("newPaymentDueDate").value;
+  const note = document.getElementById("newPaymentNote").value.trim();
+
+  if (!clientId) { setNewPaymentStatus("Sélectionnez un client.", "error"); return; }
+  if (!label) { setNewPaymentStatus("Le libellé est requis.", "error"); return; }
+  if (!amount || Number(amount) <= 0) { setNewPaymentStatus("Montant invalide.", "error"); return; }
+
+  setNewPaymentStatus("Ajout en cours...", "uploading");
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/payments`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        client_id: Number(clientId),
+        label,
+        amount: Number(amount),
+        due_date: dueDate || null,
+        note: note || null
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Échec de l'ajout du paiement.");
+
+    setNewPaymentStatus("Paiement ajouté.", "success");
+    document.getElementById("newPaymentLabel").value = "";
+    document.getElementById("newPaymentAmount").value = "";
+    document.getElementById("newPaymentDueDate").value = "";
+    document.getElementById("newPaymentNote").value = "";
+    loadPayments();
+    setTimeout(() => setNewPaymentStatus(""), 3000);
+  } catch (err) {
+    setNewPaymentStatus(`Erreur : ${err.message}`, "error");
+  }
+}
+
+async function loadPayments() {
+  const content = document.getElementById("paymentsContent");
+  const countChip = document.getElementById("paymentCountChip");
+
+  const clientId = document.getElementById("filterPaymentClient").value;
+  const status = document.getElementById("filterPaymentStatus").value;
+  const params = new URLSearchParams();
+  if (clientId) params.set("client_id", clientId);
+  if (status) params.set("status", status);
+  const qs = params.toString();
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/payments${qs ? "?" + qs : ""}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const payments = await res.json();
+    if (!res.ok) throw new Error(payments.detail);
+
+    countChip.textContent = payments.length === 0
+      ? "0 paiement"
+      : `${payments.length} paiement${payments.length > 1 ? "s" : ""}`;
+
+    if (payments.length === 0) {
+      content.innerHTML = '<p class="empty">Aucun paiement pour le moment.</p>';
+      return;
+    }
+
+    content.innerHTML = payments.map(p => {
+      const isPaid = p.status === "paid";
+      const dueLabel = p.due_date ? `Échéance : ${formatDate(p.due_date)}` : "";
+      const clientLabel = `${p.client_name || "-"}${p.company_name ? " — " + p.company_name : ""}`;
+      return `
+        <div class="payment-row" data-id="${p.id}">
+          <div class="payment-info">
+            <span class="payment-label">${escapeHtml(p.label)}</span>
+            <span class="payment-meta">${escapeHtml(clientLabel)}${dueLabel ? " · " + escapeHtml(dueLabel) : ""}</span>
+            ${p.note ? `<span class="note-sub">${escapeHtml(p.note)}</span>` : ""}
+          </div>
+          <span class="payment-amount">${formatMoney(p.amount)}</span>
+          <span class="payment-status-pill ${isPaid ? "pill-paid" : "pill-unpaid"}">${isPaid ? "Payé" : "Impayé"}</span>
+          <div class="payment-actions">
+            ${isPaid
+              ? `<button class="btn-toggle-unpaid" onclick="togglePaymentStatus(${p.id}, 'unpaid', this)">Marquer impayé</button>`
+              : `<button class="btn-toggle-paid" onclick="togglePaymentStatus(${p.id}, 'paid', this)">Marquer payé</button>`}
+          </div>
+        </div>
+      `;
+    }).join("");
+  } catch (err) {
+    content.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function togglePaymentStatus(id, newStatus, btn) {
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/admin/payments/${id}/status`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (!res.ok) throw new Error("Échec de la mise à jour du statut.");
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    loadPayments();
+  }
+}
+
+document.getElementById("filterPaymentClient").addEventListener("change", loadPayments);
+document.getElementById("filterPaymentStatus").addEventListener("change", loadPayments);
+
+/* ---------- Messagerie ---------- */
+let clientsCache = [];
+let unreadByClient = {};
+let selectedMessagingClientId = null;
+
+function formatChatTime(iso) {
+  try {
+    return new Date(iso).toLocaleString("fr-FR", {
+      day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit"
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function renderMessagingClientOptions() {
+  const select = document.getElementById("messagingClientSelect");
+  const currentValue = select.value;
+
+  const options = clientsCache.map(c => {
+    const label = `${c.full_name || c.email}${c.company_name ? " — " + c.company_name : ""}`;
+    const unread = unreadByClient[c.id] || 0;
+    const suffix = unread > 0 ? ` (${unread} non lu${unread > 1 ? "s" : ""})` : "";
+    return `<option value="${c.id}">${escapeHtml(label)}${escapeHtml(suffix)}</option>`;
+  }).join("");
+
+  select.innerHTML = '<option value="">Sélectionner un client...</option>' + options;
+  if (currentValue) select.value = currentValue;
+}
+
+let chatWidgetOpen = false;
+
+function toggleChatWidget(forceState) {
+  const widget = document.getElementById("chatWidget");
+  chatWidgetOpen = typeof forceState === "boolean" ? forceState : !chatWidgetOpen;
+  widget.classList.toggle("open", chatWidgetOpen);
+  if (chatWidgetOpen && selectedMessagingClientId) {
+    loadAdminMessages();
+  }
+}
+
+function updateChatFabBadge(count) {
+  const badge = document.getElementById("chatFabBadge");
+  if (count > 0) {
+    badge.textContent = count > 9 ? "9+" : String(count);
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
+}
+
+async function loadConversationsOverview() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/conversations`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const conversations = await res.json();
+    if (!res.ok) throw new Error(conversations.detail);
+
+    unreadByClient = {};
+    let totalUnread = 0;
+    conversations.forEach(c => {
+      unreadByClient[c.client_id] = c.unread_count;
+      totalUnread += c.unread_count;
+    });
+
+    updateChatFabBadge(totalUnread);
+    renderMessagingClientOptions();
+  } catch (err) {
+    console.error("Erreur chargement conversations:", err.message);
+  }
+}
+
+async function loadAdminMessages() {
+  const clientId = document.getElementById("messagingClientSelect").value;
+  const wrap = document.getElementById("adminChatMessages");
+  const input = document.getElementById("adminChatInput");
+  const sendBtn = document.getElementById("adminChatSendBtn");
+
+  selectedMessagingClientId = clientId || null;
+
+  if (!clientId) {
+    wrap.innerHTML = '<p class="chat-empty">Sélectionnez un client pour voir la conversation.</p>';
+    input.disabled = true;
+    sendBtn.disabled = true;
+    return;
+  }
+
+  input.disabled = false;
+  sendBtn.disabled = false;
+
+  const wasAtBottom = wrap.scrollTop + wrap.clientHeight >= wrap.scrollHeight - 20;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/messages?client_id=${clientId}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const messages = await res.json();
+    if (!res.ok) throw new Error(messages.detail);
+
+    if (messages.length === 0) {
+      wrap.innerHTML = '<p class="chat-empty">Aucun message avec ce client pour le moment.</p>';
+    } else {
+      wrap.innerHTML = messages.map(m => {
+        const own = m.sender_role === "admin";
+        return `
+          <div class="chat-bubble ${own ? "own" : "other"}">
+            ${escapeHtml(m.content)}
+            <div class="chat-meta">${formatChatTime(m.created_at)}</div>
+          </div>
+        `;
+      }).join("");
+      if (wasAtBottom) wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    loadConversationsOverview(); // rafraichit les badges (ce fil vient d'etre marque comme lu)
+  } catch (err) {
+    wrap.innerHTML = `<p class="error-state">Erreur : ${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function sendAdminMessage() {
+  const clientId = document.getElementById("messagingClientSelect").value;
+  const input = document.getElementById("adminChatInput");
+  const btn = document.getElementById("adminChatSendBtn");
+  const content = input.value.trim();
+  if (!clientId || !content) return;
+
+  btn.disabled = true;
+  try {
+    const res = await fetch(`${API_BASE}/admin/messages`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ client_id: Number(clientId), content })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Échec de l'envoi.");
+
+    input.value = "";
+    await loadAdminMessages();
+    const wrap = document.getElementById("adminChatMessages");
+    wrap.scrollTop = wrap.scrollHeight;
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById("messagingClientSelect").addEventListener("change", loadAdminMessages);
+document.getElementById("adminChatInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendAdminMessage();
+  }
+});
+
+setInterval(() => {
+  loadConversationsOverview();
+  if (selectedMessagingClientId) loadAdminMessages();
+}, 15000);
+
+document.getElementById("filterClient").addEventListener("change", loadInvoices);
+document.getElementById("filterDocType").addEventListener("change", loadInvoices);
+
+populateDocTypeFilters();
+populateDeliverableTypeSelects();
+loadPending();
+loadMessages();
+loadClients().then(() => {
+  loadInvoices();
+  loadDeliverables();
+  loadPayments();
+  loadConversationsOverview();
+});
+</script>
+
+<script>
+/* ---------- Sidebar navigation & dashboard-grid glue (added on top of the app logic above) ---------- */
+function switchPanel(panelId, btn) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  const target = document.getElementById(panelId);
+  if (target) target.classList.add("active");
+
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  if (btn) {
+    btn.classList.add("active");
+    const mobileTitle = document.getElementById("mobileTitle");
+    if (mobileTitle) mobileTitle.textContent = btn.dataset.label || btn.textContent.trim();
+  }
+  closeSidebarMobile();
+  window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+}
+
+function toggleSidebarMobile() {
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sidebarOverlay").classList.toggle("show");
+}
+function closeSidebarMobile() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarOverlay").classList.remove("show");
+}
+
+function syncBadge(chipId, badgeId) {
+  const chip = document.getElementById(chipId);
+  const badge = document.getElementById(badgeId);
+  if (!chip || !badge) return;
+  const match = chip.textContent.match(/\d+/);
+  const n = match ? parseInt(match[0], 10) : 0;
+  badge.textContent = n > 99 ? "99+" : String(n);
+  badge.classList.toggle("zero", n === 0);
+}
+function syncAllBadges() {
+  syncBadge("countChip", "navBadgeAccounts");
+  syncBadge("msgCountChip", "navBadgeMessages");
+  syncBadge("invoiceCountChip", "navBadgeDocuments");
+  syncBadge("deliverableCountChip", "navBadgeDeliverables");
+  syncBadge("paymentCountChip", "navBadgePayments");
+}
+["countChip", "msgCountChip", "invoiceCountChip", "deliverableCountChip", "paymentCountChip"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) new MutationObserver(syncAllBadges).observe(el, { childList: true, characterData: true, subtree: true });
+});
+setTimeout(syncAllBadges, 700);
+setInterval(syncAllBadges, 5000);
+</script>
+
+</body>
+</html>
