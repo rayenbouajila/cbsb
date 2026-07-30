@@ -61,6 +61,13 @@ def admin_dashboard():
 @app.get("/client-dashboard")
 def client_dashboard():
     return FileResponse("frontend/client-dashboard.html")
+@app.get("/test-db")
+def test_db():
+    try:
+        engine.connect()
+        return {"database":"connected"}
+    except Exception as e:
+        return {"error":str(e)}
 @app.on_event("startup")
 def create_default_admin():
     db = SessionLocal()
