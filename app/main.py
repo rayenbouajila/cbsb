@@ -13,7 +13,7 @@ from fastapi.responses import HTMLResponse
 
 
 models.Base.metadata.create_all(bind=engine)
-app = FastAPI(title="Auth API - Client/Admin")
+app = FastAPI(title="Cabinet Ben Said Belgacem")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5500", "http://127.0.0.1:5500"],  # a restreindre en production
@@ -34,6 +34,14 @@ app.include_router(admin_router.router)
 app.include_router(contact.router)
 app.include_router(invoices_router.router)
 
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request}
+    )
+
+
 @app.get("/login")
 def login_page():
     return FileResponse("frontend/login.html")
@@ -49,12 +57,7 @@ from fastapi.responses import FileResponse
 @app.get("/admin-dashboard")
 def admin_dashboard():
     return FileResponse("frontend/admin-dashboard.html")
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse(
-        "login.html",
-        {"request": request}
-    )
+
 @app.get("/client-dashboard")
 def client_dashboard():
     return FileResponse("frontend/client-dashboard.html")
