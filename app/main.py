@@ -73,6 +73,8 @@ def create_default_admin():
                 role=models.RoleEnum.admin,
                 status=models.StatusEnum.active,
                 full_name="Administrateur",
+                matricule_fiscal="admin"
+
             )
             db.add(admin)
             db.commit()
