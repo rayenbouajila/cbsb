@@ -58,3 +58,21 @@ async def home(request: Request):
 @app.get("/client-dashboard")
 def client_dashboard():
     return FileResponse("frontend/client-dashboard.html")
+@app.on_event("startup")
+def create_default_admin():
+    db = SessionLocal()
+    try:
+        exists = db.query(models.User).filter(models.User.role == models.RoleEnum.admin).first()
+        if not exists:
+            admin = models.User(
+                email="admin@comptaflow.com",
+                password_hash=auth_utils.hash_password("rayen123"),
+                role=models.RoleEnum.admin,
+                status=models.StatusEnum.active,
+                full_name="Administrateur",
+            )
+            db.add(admin)
+            db.commit()
+            print("Compte admin cree : admin@comptaflow.com / rayen123")
+    finally:
+        db.close()
