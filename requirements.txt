@@ -6,7 +6,7 @@ python-jose[cryptography]==3.3.0
 passlib==1.7.4
 bcrypt==3.2.2
 python-dotenv==1.0.1
-pydantic[email]==2.7.1
+pydantic==2.11.7
 python-multipart==0.0.9
 pytest==8.2.2
 pdfplumber
