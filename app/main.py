@@ -1,9 +1,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.templating import Jinja2Templates
 from . import models, auth_utils
 from .database import engine, SessionLocal
 from .routers import auth_router, admin_router,contact,invoices_router,deliverables_router,export_router,fiscal_router, payments_router,messages_router,fiscal_router
+from fastapi import Request
+from fastapi.responses import HTMLResponse
+
+
+
+
+
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Auth API - Client/Admin")
 app.add_middleware(
@@ -14,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+templates = Jinja2Templates(directory="frontend")
 app.include_router(fiscal_router.router)
 app.include_router(messages_router.router)
 app.include_router(fiscal_router.router)
@@ -41,28 +49,12 @@ from fastapi.responses import FileResponse
 @app.get("/admin-dashboard")
 def admin_dashboard():
     return FileResponse("frontend/admin-dashboard.html")
-@app.get("/")
-def home():
-    return FileResponse("frontend/index.html")
-
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse(
+        "login.html",
+        {"request": request}
+    )
 @app.get("/client-dashboard")
 def client_dashboard():
     return FileResponse("frontend/client-dashboard.html")
-@app.on_event("startup")
-def create_default_admin():
-    db = SessionLocal()
-    try:
-        exists = db.query(models.User).filter(models.User.role == models.RoleEnum.admin).first()
-        if not exists:
-            admin = models.User(
-                email="admin@comptaflow.com",
-                password_hash=auth_utils.hash_password("rayen123"),
-                role=models.RoleEnum.admin,
-                status=models.StatusEnum.active,
-                full_name="Administrateur",
-            )
-            db.add(admin)
-            db.commit()
-            print("Compte admin cree : admin@comptaflow.com / rayen123")
-    finally:
-        db.close()
