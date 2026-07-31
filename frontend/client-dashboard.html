@@ -1203,7 +1203,7 @@ h3.section-title{
 </div>
 
 <script>
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://cbsb-production.up.railway.app";
 const token = sessionStorage.getItem("token");
 const MAX_SIZE = 10 * 1024 * 1024; // 10 Mo
 
@@ -1904,7 +1904,7 @@ navItems.forEach(btn => {
 populateDocTypeSelect();
 loadProfile();
 loadDocumentRequests();
-loadDeliverables();
+loadDeliverables(); 
 loadFiscalSituation();
 loadPayments();
 loadMessages();
