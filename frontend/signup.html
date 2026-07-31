@@ -265,98 +265,6 @@
     outline-offset: 3px;
   }
 
-  /* ---------- Verification (OTP) step ---------- */
-  #verifySection{ display:none; }
-
-  .verify-icon{
-    width:48px; height:48px;
-    border-radius:50%;
-    background: rgba(66,132,117,.1);
-    color: var(--teal);
-    display:flex; align-items:center; justify-content:center;
-    margin-bottom:18px;
-  }
-
-  .verify-target{
-    font-family: var(--font-mono);
-    font-size:13px;
-    color: var(--text-on-cream);
-    background: rgba(255,244,225,.6);
-    border: 1px solid rgba(26,49,44,.08);
-    border-radius: 4px;
-    padding: 9px 12px;
-    margin: 0 0 26px;
-    word-break: break-all;
-  }
-
-  .otp-row{
-    display:flex;
-    gap:9px;
-    margin-bottom: 6px;
-  }
-  .otp-digit{
-    width:100%;
-    aspect-ratio: 1 / 1;
-    text-align:center;
-    font-family: var(--font-mono);
-    font-size:22px;
-    font-weight:600;
-    color: var(--forest);
-    background: transparent;
-    border: 1.5px solid rgba(26,49,44,.22);
-    border-radius:6px;
-    padding:0;
-  }
-  .otp-digit:focus{
-    outline:none;
-    border-color: var(--teal);
-    box-shadow: 0 0 0 3px rgba(137,215,183,.28);
-  }
-  .otp-digit.invalid{ border-color: var(--ink-red); }
-
-  .otp-hint{
-    font-family: var(--font-mono);
-    font-size:11px;
-    color:#8A9A93;
-    margin: 0 0 22px;
-  }
-
-  .resend-row{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    margin-top:18px;
-    font-size:13px;
-    color:#5A6E67;
-  }
-  .resend-btn{
-    width:auto;
-    padding:0;
-    margin:0;
-    background:none;
-    color: var(--teal);
-    font-family: var(--font-body);
-    font-weight:600;
-    font-size:13px;
-    text-decoration:underline;
-    text-underline-offset:2px;
-  }
-  .resend-btn:hover{ background:none; box-shadow:none; color: var(--forest); }
-  .resend-btn:disabled{ background:none; color:#9BA9A3; cursor:not-allowed; text-decoration:none; }
-
-  .back-link{
-    display:block;
-    text-align:center;
-    margin-top:16px;
-    font-size:12.5px;
-    color:#8A9A93;
-    text-decoration:none;
-    cursor:pointer;
-    border-bottom:1px solid transparent;
-  }
-  .back-link:hover{ color: var(--teal); border-bottom-color: var(--teal); }
-
   .verified-panel{ display:none; text-align:center; }
   .verified-icon{
     width:56px; height:56px;
@@ -375,7 +283,6 @@
     .stepper{ margin-top:26px; }
     .form-panel{ padding: 36px 24px 56px; }
     .grid-2{ grid-template-columns: 1fr; }
-    .otp-digit{ font-size:19px; }
   }
 </style>
 </head>
@@ -396,14 +303,10 @@
       </div>
       <div class="step" id="step-2">
         <span class="step-num">02</span>
-        <span class="step-text"><b>Vérification email</b><span>Vous saisissez le code reçu par email</span></span>
+        <span class="step-text"><b>Examen du dossier</b><span>Notre équipe examine votre demande</span></span>
       </div>
       <div class="step" id="step-3">
         <span class="step-num">03</span>
-        <span class="step-text"><b>Examen du dossier</b><span>Notre équipe examine votre demande</span></span>
-      </div>
-      <div class="step" id="step-4">
-        <span class="step-num">04</span>
         <span class="step-text"><b>Accès validé</b><span>Vous recevez un email et pouvez vous connecter</span></span>
       </div>
     </div>
@@ -460,44 +363,13 @@
         <a class="switch-link" href="/login">Déjà un compte ? Se connecter</a>
       </div>
 
-      <!-- ---------- Étape 2 : saisie du code OTP ---------- -->
-      <div id="verifySection">
-        <div class="verify-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
-        </div>
-        <h2>Vérifiez votre email</h2>
-        <p class="subhead">Un code à 6 chiffres a été envoyé à l'adresse suivante. Il expire dans 10 minutes.</p>
-        <p class="verify-target" id="verifyTargetEmail"></p>
-
-        <div class="msg" id="verifyMsg"></div>
-
-        <div class="otp-row" id="otpRow">
-          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="0" autocomplete="one-time-code">
-          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="1">
-          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="2">
-          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="3">
-          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="4">
-          <input type="text" inputmode="numeric" maxlength="1" class="otp-digit" data-idx="5">
-        </div>
-        <p class="otp-hint">Vous pouvez coller le code entier, il se répartira automatiquement.</p>
-
-        <button id="verifyBtn" onclick="verifyEmail()">Vérifier le code</button>
-
-        <div class="resend-row">
-          <span>Vous n'avez rien reçu ?</span>
-          <button class="resend-btn" id="resendBtn" onclick="resendCode()">Renvoyer le code</button>
-        </div>
-
-        <a class="back-link" onclick="backToSignup()">← Revenir au formulaire</a>
-      </div>
-
-      <!-- ---------- Étape 3 : confirmation finale ---------- -->
+      <!-- ---------- Étape 2 : confirmation / attente de validation admin ---------- -->
       <div id="verifiedPanel" class="verified-panel">
         <div class="verified-icon">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
         </div>
-        <h2>Email vérifié</h2>
-        <p class="subhead">Votre demande est maintenant en attente de validation par le cabinet. Vous recevrez un email dès que votre accès sera activé.</p>
+        <h2>Demande envoyée</h2>
+        <p class="subhead">Votre demande est en attente de validation par le cabinet. Vous recevrez un email dès que votre accès sera activé.</p>
         <a class="switch-link" href="/login">Retour à la page de connexion</a>
       </div>
 
@@ -510,10 +382,6 @@
 const API_BASE = "https://cbsb-production.up.railway.app";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-const RESEND_COOLDOWN_SECONDS = 60;
-
-let registeredEmail = "";
-let resendTimer = null;
 
 function setFieldError(id, message) {
   const input = document.getElementById(id);
@@ -617,8 +485,7 @@ async function signup() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Échec de l'inscription.");
 
-    registeredEmail = email;
-    showVerifyStep();
+    showPendingStep();
   } catch (err) {
     msgBox.className = "msg error";
     msgBox.textContent = err.message;
@@ -628,166 +495,14 @@ async function signup() {
   }
 }
 
-/* ---------- Étape 2 : vérification OTP ---------- */
+/* ---------- Étape 2 : demande envoyée, en attente de validation admin ---------- */
 
-function showVerifyStep() {
+function showPendingStep() {
   document.getElementById("signupSection").style.display = "none";
-  document.getElementById("verifySection").style.display = "block";
-  document.getElementById("verifyTargetEmail").textContent = registeredEmail;
+  document.getElementById("verifiedPanel").style.display = "block";
 
   document.getElementById("step-1").classList.replace("active", "done");
   document.getElementById("step-2").classList.add("active");
-
-  clearOtpInputs();
-  startResendCooldown();
-  document.querySelector('.otp-digit[data-idx="0"]').focus();
-}
-
-function backToSignup() {
-  document.getElementById("verifySection").style.display = "none";
-  document.getElementById("signupSection").style.display = "block";
-  document.getElementById("step-2").classList.remove("active");
-  document.getElementById("step-1").classList.replace("done", "active");
-  if (resendTimer) clearInterval(resendTimer);
-}
-
-function clearOtpInputs() {
-  document.querySelectorAll(".otp-digit").forEach(input => {
-    input.value = "";
-    input.classList.remove("invalid");
-  });
-}
-
-function getOtpCode() {
-  const digits = Array.from(document.querySelectorAll(".otp-digit")).map(i => i.value);
-  return digits.join("");
-}
-
-function setOtpInvalid(isInvalid) {
-  document.querySelectorAll(".otp-digit").forEach(input => input.classList.toggle("invalid", isInvalid));
-}
-
-// Auto-avance entre les cases + support du collage du code entier
-document.querySelectorAll(".otp-digit").forEach((input, idx, all) => {
-  input.addEventListener("input", () => {
-    input.value = input.value.replace(/\D/g, "").slice(0, 1);
-    if (input.value && idx < all.length - 1) {
-      all[idx + 1].focus();
-    }
-    setOtpInvalid(false);
-    if (getOtpCode().length === 6) verifyEmail();
-  });
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace" && !input.value && idx > 0) {
-      all[idx - 1].focus();
-    }
-  });
-
-  input.addEventListener("paste", (e) => {
-    e.preventDefault();
-    const pasted = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g, "").slice(0, 6);
-    if (!pasted) return;
-    pasted.split("").forEach((digit, i) => {
-      if (all[i]) all[i].value = digit;
-    });
-    const lastFilled = Math.min(pasted.length, all.length) - 1;
-    if (lastFilled >= 0) all[lastFilled].focus();
-    setOtpInvalid(false);
-    if (getOtpCode().length === 6) verifyEmail();
-  });
-});
-
-async function verifyEmail() {
-  const msgBox = document.getElementById("verifyMsg");
-  msgBox.className = "msg";
-  msgBox.textContent = "";
-
-  const code = getOtpCode();
-  if (code.length !== 6) {
-    msgBox.className = "msg error";
-    msgBox.textContent = "Saisissez les 6 chiffres du code.";
-    setOtpInvalid(true);
-    return;
-  }
-
-  const btn = document.getElementById("verifyBtn");
-  btn.disabled = true;
-  btn.textContent = "Vérification...";
-
-  try {
-    const res = await fetch(`${API_BASE}/auth/verify-email`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: registeredEmail, code })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Code invalide.");
-
-    showVerifiedStep();
-  } catch (err) {
-    msgBox.className = "msg error";
-    msgBox.textContent = err.message;
-    setOtpInvalid(true);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Vérifier le code";
-  }
-}
-
-function showVerifiedStep() {
-  if (resendTimer) clearInterval(resendTimer);
-  document.getElementById("verifySection").style.display = "none";
-  document.getElementById("verifiedPanel").style.display = "block";
-
-  document.getElementById("step-2").classList.replace("active", "done");
-  document.getElementById("step-3").classList.add("active");
-}
-
-/* ---------- Renvoi du code ---------- */
-
-function startResendCooldown() {
-  const btn = document.getElementById("resendBtn");
-  let remaining = RESEND_COOLDOWN_SECONDS;
-  btn.disabled = true;
-  btn.textContent = `Renvoyer le code (${remaining}s)`;
-
-  if (resendTimer) clearInterval(resendTimer);
-  resendTimer = setInterval(() => {
-    remaining -= 1;
-    if (remaining <= 0) {
-      clearInterval(resendTimer);
-      btn.disabled = false;
-      btn.textContent = "Renvoyer le code";
-    } else {
-      btn.textContent = `Renvoyer le code (${remaining}s)`;
-    }
-  }, 1000);
-}
-
-async function resendCode() {
-  const msgBox = document.getElementById("verifyMsg");
-  msgBox.className = "msg";
-  msgBox.textContent = "";
-
-  try {
-    const res = await fetch(`${API_BASE}/auth/resend-verification-code`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: registeredEmail })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Échec du renvoi du code.");
-
-    clearOtpInputs();
-    document.querySelector('.otp-digit[data-idx="0"]').focus();
-    msgBox.className = "msg success";
-    msgBox.textContent = "Un nouveau code a été envoyé.";
-    startResendCooldown();
-  } catch (err) {
-    msgBox.className = "msg error";
-    msgBox.textContent = err.message;
-  }
 }
 </script>
 </body>
