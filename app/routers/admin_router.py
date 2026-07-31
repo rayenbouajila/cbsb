@@ -22,7 +22,7 @@ def approve_user(user_id: int, db: Session = Depends(get_db), _: models.User = D
     db.commit()
 
     activation_token = auth_utils.create_activation_token(user.id)
-    activation_link = f"http://localhost:5500/activate.html?token={activation_token}"
+    activation_link = f"https://cbsb-production.up.railway.app/activate.html?token={activation_token}"
 
     # TODO : remplacer ce print par un envoi email reel (smtplib, Resend, Mailjet...)
     print(f"[EMAIL] Lien d'activation pour {user.email} : {activation_link}")

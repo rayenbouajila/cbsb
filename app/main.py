@@ -16,7 +16,7 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Cabinet Ben Said Belgacem")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5500", "http://127.0.0.1:5500"],  # a restreindre en production
+    allow_origins=["http://localhost:5500", "http://127.0.0.1:5500","https://cbsb-production.up.railway.app"],  # a restreindre en production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
