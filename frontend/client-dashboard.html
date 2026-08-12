@@ -616,10 +616,10 @@ h3.section-title{
   background: currentColor;
   flex-shrink:0;
 }
-.status-en_attente{ background: rgba(66,132,117,.1); color: var(--teal); }
+.status-paiement_rejete{ background: rgba(66,132,117,.1); color: var(--teal); }
 .status-depose{ background: rgba(74,144,217,.12); color:#2E5A87; }
 .status-paiement_accepte{ background: rgba(137,215,183,.22); color:#1A312C; }
-.status-en_retard{ background: rgba(166,67,45,.09); color: var(--ink-red); }
+.status-envoye_pour_paiement{ background: rgba(166,67,45,.09); color: var(--ink-red); }
 
 /* ---------- Payments list ---------- */
 .payment-row{
@@ -1420,10 +1420,10 @@ const ANNUAL_TYPE_LABELS = {
   declaration_impot: "Déclaration d'impôt",
 };
 const FISCAL_STATUS_LABELS = {
-  en_attente: "En attente",
+  paiement_rejete: "Paiement rejeté",
   depose: "Déposé",
   paiement_accepte: "Paiement accepté",
-  en_retard: "En retard",
+  envoye_pour_paiement: "Envoyé pour paiement",
 };
 
 function formatMoney(value) {
@@ -1495,7 +1495,7 @@ async function loadFiscalSituation() {
 
     if (statPaid) statPaid.textContent = sortedMonthly.filter(r => r.status === "paiement_accepte").length;
     if (statDeposited) statDeposited.textContent = sortedMonthly.filter(r => r.status === "depose").length;
-    if (statLate) statLate.textContent = sortedMonthly.filter(r => r.status === "en_retard").length;
+    if (statLate) statLate.textContent = sortedMonthly.filter(r => r.status === "envoye_pour_paiement").length;
 
     const annualBody = document.getElementById("annualFiscalBody");
     annualBody.innerHTML = situation.annual_declarations.map(r => `
