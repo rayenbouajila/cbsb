@@ -253,7 +253,7 @@ class AnnualFiscalDeclaration(Base):
     due_date = Column(Date, nullable=False)
     submission_date = Column(Date, nullable=True)
     amount = Column(Numeric(14, 3), nullable=True)
-    status = Column(Enum(FiscalStatusEnum), nullable=False, default=FiscalStatusEnum.en_attente)
+    status = Column(Enum(FiscalStatusEnum), nullable=False, default=FiscalStatusEnum.envoye_pour_paiement)
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
