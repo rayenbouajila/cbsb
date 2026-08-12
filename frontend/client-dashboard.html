@@ -616,10 +616,9 @@ h3.section-title{
   background: currentColor;
   flex-shrink:0;
 }
-.status-paiement_rejete{ background: rgba(66,132,117,.1); color: var(--teal); }
-.status-depose{ background: rgba(74,144,217,.12); color:#2E5A87; }
+.status-envoye_paiement{ background: rgba(74,144,217,.12); color:#2E5A87; }
 .status-paiement_accepte{ background: rgba(137,215,183,.22); color:#1A312C; }
-.status-envoye_pour_paiement{ background: rgba(166,67,45,.09); color: var(--ink-red); }
+.status-paiement_rejete{ background: rgba(166,67,45,.09); color: var(--ink-red); }
 
 /* ---------- Payments list ---------- */
 .payment-row{
@@ -1420,10 +1419,9 @@ const ANNUAL_TYPE_LABELS = {
   declaration_impot: "Déclaration d'impôt",
 };
 const FISCAL_STATUS_LABELS = {
-  paiement_rejete: "Paiement rejeté",
-  depose: "Déposé",
+  envoye_paiement: "Envoyé pour paiement",
   paiement_accepte: "Paiement accepté",
-  envoye_pour_paiement: "Envoyé pour paiement",
+  paiement_rejete: "Paiement rejeté",
 };
 
 function formatMoney(value) {
@@ -1470,9 +1468,9 @@ async function loadFiscalSituation() {
     if (res.status === 404) {
       emptyState.textContent = `Aucune situation fiscale disponible pour ${year}.`;
       emptyState.style.display = "block";
-      if (statPaid) statPaid.textContent = "—";
-      if (statDeposited) statDeposited.textContent = "—";
-      if (statLate) statLate.textContent = "—";
+        if (statPaid) statPaid.textContent = "—";
+        if (statDeposited) statDeposited.textContent = "—";
+        if (statLate) statLate.textContent = "—";
       return;
     }
 
@@ -1494,8 +1492,8 @@ async function loadFiscalSituation() {
     `).join("");
 
     if (statPaid) statPaid.textContent = sortedMonthly.filter(r => r.status === "paiement_accepte").length;
-    if (statDeposited) statDeposited.textContent = sortedMonthly.filter(r => r.status === "depose").length;
-    if (statLate) statLate.textContent = sortedMonthly.filter(r => r.status === "envoye_pour_paiement").length;
+    if (statDeposited) statDeposited.textContent = sortedMonthly.filter(r => r.status === "envoye_paiement").length;
+    if (statLate) statLate.textContent = sortedMonthly.filter(r => r.status === "paiement_rejete").length;
 
     const annualBody = document.getElementById("annualFiscalBody");
     annualBody.innerHTML = situation.annual_declarations.map(r => `

@@ -205,12 +205,9 @@ class ClientTypeEnum(str, enum.Enum):
 
 
 class FiscalStatusEnum(str, enum.Enum):
-    en_attente = "en_attente"
-    depose = "depose"
-    paye = "paye"
-    en_retard = "en_retard"
-
-
+    envoye_paiement = "envoye_paiement"
+    paiement_accepte = "paiement_accepte"
+    paiement_rejete = "paiement_rejete"
 class FiscalSituation(Base):
     __tablename__ = "fiscal_situations"
 
