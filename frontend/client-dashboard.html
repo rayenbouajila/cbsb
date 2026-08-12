@@ -1070,15 +1070,15 @@ h3.section-title{
           <div class="span-12" id="fiscalContent" style="display:none;">
             <div class="section-grid" style="margin-bottom:20px;">
               <div class="span-4 stat-card">
-                <span class="stat-label">Payé</span>
+                <span class="stat-label">Paiement accepté</span>
                 <span class="stat-value" id="fiscalStatPaid">0</span>
               </div>
               <div class="span-4 stat-card">
-                <span class="stat-label">Déposé</span>
+                <span class="stat-label">Paiement rejeté</span>
                 <span class="stat-value" id="fiscalStatDeposited">0</span>
               </div>
               <div class="span-4 stat-card">
-                <span class="stat-label">En retard</span>
+                <span class="stat-label">Envoyé pour paiement</span>
                 <span class="stat-value" id="fiscalStatLate">0</span>
               </div>
             </div>
@@ -1420,10 +1420,10 @@ const ANNUAL_TYPE_LABELS = {
   declaration_impot: "Déclaration d'impôt",
 };
 const FISCAL_STATUS_LABELS = {
-  en_attente: "En attente",
-  depose: "Déposé",
-  paye: "Payé",
-  en_retard: "En retard",
+
+  paiement_accepte: "Paiement accepté",
+  paiement_rejete: "Paiement rejeté",
+  envoye_pour_paiement: "Envoyé pour paiement",
 };
 
 function formatMoney(value) {
