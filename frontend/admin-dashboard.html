@@ -507,10 +507,10 @@
     cursor:pointer;
     border:1px solid transparent;
   }
-  .status-en_attente{ background: rgba(66,132,117,.12); color: var(--teal); border-color: rgba(66,132,117,.3); }
+  .status-paiement_rejete{ background: rgba(66,132,117,.12); color: var(--teal); border-color: rgba(66,132,117,.3); }
   .status-depose{ background: rgba(74,144,217,.14); color:#2E5A87; border-color: rgba(74,144,217,.3); }
-  .status-paye{ background: rgba(137,215,183,.28); color:#1A312C; border-color: rgba(66,132,117,.35); }
-  .status-en_retard{ background: rgba(166,67,45,.1); color: var(--ink-red); border-color: rgba(166,67,45,.3); }
+  .status-paiement_accepte{ background: rgba(137,215,183,.28); color:#1A312C; border-color: rgba(66,132,117,.35); }
+  .status-envoye_pour_paiement{ background: rgba(166,67,45,.1); color: var(--ink-red); border-color: rgba(166,67,45,.3); }
 
   /* ---------- Payments ---------- */
   .payment-row{
@@ -2058,10 +2058,9 @@ const ANNUAL_TYPE_LABELS = {
   declaration_impot: "Déclaration d'impôt",
 };
 const FISCAL_STATUS_LABELS = {
-  // en_attente: "En attente",
+  // paiement_rejete: "En attente",
   // depose: "Déposé",
   paiement_accepte: "Paiement accepté",
-  paiement_rejete: "Paiement rejeté",
   envoye_pour_paiement: "Envoyé pour paiement",
 };
 

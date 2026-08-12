@@ -618,7 +618,7 @@ h3.section-title{
 }
 .status-en_attente{ background: rgba(66,132,117,.1); color: var(--teal); }
 .status-depose{ background: rgba(74,144,217,.12); color:#2E5A87; }
-.status-paye{ background: rgba(137,215,183,.22); color:#1A312C; }
+.status-paiement_accepte{ background: rgba(137,215,183,.22); color:#1A312C; }
 .status-en_retard{ background: rgba(166,67,45,.09); color: var(--ink-red); }
 
 /* ---------- Payments list ---------- */
@@ -1070,15 +1070,15 @@ h3.section-title{
           <div class="span-12" id="fiscalContent" style="display:none;">
             <div class="section-grid" style="margin-bottom:20px;">
               <div class="span-4 stat-card">
-                <span class="stat-label">Paiement accepté</span>
+                <span class="stat-label">Payé</span>
                 <span class="stat-value" id="fiscalStatPaid">0</span>
               </div>
               <div class="span-4 stat-card">
-                <span class="stat-label">Paiement rejeté</span>
+                <span class="stat-label">Déposé</span>
                 <span class="stat-value" id="fiscalStatDeposited">0</span>
               </div>
               <div class="span-4 stat-card">
-                <span class="stat-label">Envoyé pour paiement</span>
+                <span class="stat-label">En retard</span>
                 <span class="stat-value" id="fiscalStatLate">0</span>
               </div>
             </div>
@@ -1420,10 +1420,10 @@ const ANNUAL_TYPE_LABELS = {
   declaration_impot: "Déclaration d'impôt",
 };
 const FISCAL_STATUS_LABELS = {
-
+  en_attente: "En attente",
+  depose: "Déposé",
   paiement_accepte: "Paiement accepté",
-  paiement_rejete: "Paiement rejeté",
-  envoye_pour_paiement: "Envoyé pour paiement",
+  en_retard: "En retard",
 };
 
 function formatMoney(value) {
@@ -1493,7 +1493,7 @@ async function loadFiscalSituation() {
       </tr>
     `).join("");
 
-    if (statPaid) statPaid.textContent = sortedMonthly.filter(r => r.status === "paye").length;
+    if (statPaid) statPaid.textContent = sortedMonthly.filter(r => r.status === "paiement_accepte").length;
     if (statDeposited) statDeposited.textContent = sortedMonthly.filter(r => r.status === "depose").length;
     if (statLate) statLate.textContent = sortedMonthly.filter(r => r.status === "en_retard").length;
 

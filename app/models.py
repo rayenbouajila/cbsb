@@ -205,9 +205,10 @@ class ClientTypeEnum(str, enum.Enum):
 
 
 class FiscalStatusEnum(str, enum.Enum):
-    paiement_rejete = "paiement_rejete"
-    paiement_accepte = "paiement_accepte"
-    envoye_pour_paiement = "envoye_pour_paiement"
+    en_attente = "en_attente"
+    depose = "depose"
+    paye = "paye"
+    en_retard = "en_retard"
 
 
 class FiscalSituation(Base):
@@ -238,7 +239,7 @@ class MonthlyFiscalDeclaration(Base):
     due_date = Column(Date, nullable=False)
     submission_date = Column(Date, nullable=True)
     payment_date = Column(Date, nullable=True)
-    status = Column(Enum(FiscalStatusEnum), nullable=False, default=FiscalStatusEnum.envoye_pour_paiement)
+    status = Column(Enum(FiscalStatusEnum), nullable=False, default=FiscalStatusEnum.en_attente)
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -253,7 +254,7 @@ class AnnualFiscalDeclaration(Base):
     due_date = Column(Date, nullable=False)
     submission_date = Column(Date, nullable=True)
     amount = Column(Numeric(14, 3), nullable=True)
-    status = Column(Enum(FiscalStatusEnum), nullable=False, default=FiscalStatusEnum.envoye_pour_paiement)
+    status = Column(Enum(FiscalStatusEnum), nullable=False, default=FiscalStatusEnum.en_attente)
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -268,7 +269,7 @@ class ProvisionalPayment(Base):
     due_date = Column(Date, nullable=False)
     amount = Column(Numeric(14, 3), nullable=True)
     payment_date = Column(Date, nullable=True)
-    status = Column(Enum(FiscalStatusEnum), nullable=False, default=FiscalStatusEnum.envoye_pour_paiement)
+    status = Column(Enum(FiscalStatusEnum), nullable=False, default=FiscalStatusEnum.en_attente)
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
