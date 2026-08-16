@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException,Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from .. import models, schemas, auth_utils
 from ..database import get_db
@@ -9,9 +9,13 @@ from fastapi import Query
 from fastapi.responses import FileResponse
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+
 @router.get("/pending-users", response_model=List[schemas.UserOut])
 def pending_users(db: Session = Depends(get_db), _: models.User = Depends(auth_utils.require_admin)):
     return db.query(models.User).filter(models.User.status == models.StatusEnum.pending).all()
+
+
 @router.post("/approve-user/{user_id}")
 def approve_user(user_id: int, db: Session = Depends(get_db), _: models.User = Depends(auth_utils.require_admin)):
     user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -19,15 +23,10 @@ def approve_user(user_id: int, db: Session = Depends(get_db), _: models.User = D
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
     user.status = models.StatusEnum.active
+    user.email_verified = True
     db.commit()
 
-    activation_token = auth_utils.create_activation_token(user.id)
-    activation_link = f"https://cbsb-production.up.railway.app/activate.html?token={activation_token}"
-
-    # TODO : remplacer ce print par un envoi email reel (smtplib, Resend, Mailjet...)
-    print(f"[EMAIL] Lien d'activation pour {user.email} : {activation_link}")
-
-    return {"detail": "Compte valide", "activation_link": activation_link}
+    return {"detail": "Compte valide"}
 
 
 @router.post("/reject-user/{user_id}")
@@ -38,9 +37,12 @@ def reject_user(user_id: int, db: Session = Depends(get_db), _: models.User = De
     user.status = models.StatusEnum.rejected
     db.commit()
     return {"detail": "Compte rejete"}
+
+
 @router.get("/contact-messages", response_model=list[schemas.ContactMessageOut])
 async def get_contact_messages(db: Session = Depends(get_db), admin=Depends(auth_utils.require_admin)):
     return db.query(models.ContactMessage).order_by(models.ContactMessage.created_at.desc()).all()
+
 
 @router.delete("/contact-messages/{message_id}")
 async def delete_contact_message(message_id: int, db: Session = Depends(get_db), admin=Depends(auth_utils.require_admin)):
@@ -50,8 +52,7 @@ async def delete_contact_message(message_id: int, db: Session = Depends(get_db),
     db.delete(msg)
     db.commit()
     return {"status": "deleted"}
-from pathlib import Path
-from fastapi.responses import FileResponse
+
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "storage" / "invoices"
 
@@ -122,6 +123,8 @@ def admin_list_clients(db: Session = Depends(get_db), admin=Depends(auth_utils.r
         .order_by(models.User.full_name)
         .all()
     )
+
+
 @router.post("/document-requests", response_model=schemas.DocumentRequestOut)
 def admin_create_document_request(
     payload: schemas.DocumentRequestCreate,
